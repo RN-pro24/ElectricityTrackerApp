@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+<form action="/login" method="post">
+    <div class="mb-3">
+        {% if errors.username %}
+        <p style="color: red;">{{ errors.username }}</p>
+        {% endif %}
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" required placeholder="Username" type="text">
+    </div>
+    <div class="mb-3">
+        {% if errors.password %}
+        <p style="color: red;">{{ errors.password }}</p>
+        {% endif %}
+        <input class="form-control mx-auto w-auto" name="password" required placeholder="Password" type="password">
+    </div>
+        {% if errors.access %}
+        <p style="color: red;">{{ errors.access }}</p>
+        {% endif %}
+    <button class="btn btn-primary" type="submit">Log In</button>
+</form>
+
+{% endblock %}
