@@ -9,8 +9,8 @@
         <!-- Tanto como first name, last name debo configurar correctamente los errores y el vinculo
           con python ya que cambie el nombre de las variables-->
         <div class="mb-3">
-            {% if errors.name %}
-            <p style="color: red;">{{ errors.name }}</p>
+            {% if errors.first_name %}
+            <p style="color: red;">{{ errors.first_name }}</p>
             {% endif %}
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="first_name" required placeholder="First name" type="text">
         </div>
@@ -27,10 +27,10 @@
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="email" required placeholder="Email" type="email">
         </div>
         <div class="mb-3">
-            {% if errors.username or errors.usarname_used %}
-            <p style="color: red;">{{ errors.username if errors.username else errors.username_used }}</p>
+            {% if errors.user_name or errors.user_exist %}
+            <p style="color: red;">{{ errors.user_name if errors.user_name else errors.user_exist }}</p>
             {% endif %}
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" required placeholder="Username" type="text">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="user_name" required placeholder="Username" type="text">
         </div>
         <div class="mb-3">
             {% if errors.password %}
@@ -39,8 +39,8 @@
             <input class="form-control mx-auto w-auto" name="password" required placeholder="Password" type="password">
         </div>
         <div class="mb-3">
-            {% if errors.confirmation or errors.macht %}
-            <p style="color: red;">{{ errors.confirmation if errors.confirmation else errors.macht }}</p>
+            {% if errors.confirmation or errors.match %}
+            <p style="color: red;">{{ errors.confirmation if errors.confirmation else errors.match }}</p>
             {% endif %}
             <input class="form-control mx-auto w-auto" name="confirmation" required placeholder="Confirm Password" type="password">
         </div>
