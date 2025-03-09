@@ -130,3 +130,9 @@ def logout():
     return redirect("/")
 
 
+@app.route('/modificar_plan', methods=['POST'])
+def modificar_plan():
+    plan = consultar_plan(request.form.get('select_plan'))
+    return render_template('index.html', plan=plan, modal_to_open="edit")
+
+

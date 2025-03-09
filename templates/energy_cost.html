@@ -1,0 +1,251 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Energy cost
+{% endblock %}
+
+{% block main %}
+
+<h1>Energy cost</h1>
+    <button id="openModalModificarBtn" class="btn btn-secondary">Modify Plan</button>
+    <button id="openModalRegistrarBtn" class="btn btn-primary">Register Plan</button>
+
+    <!-- Tabla para mostrar los planes actuales -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>effective date</th>
+                <th>country</th>
+                <th>company</th>
+                <th>contract electrical</th>
+                <th>fee type</th>
+                <th>fee_name</th>
+                <th>start_time</th>
+                <th>end_time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in plans %}
+            <tr>
+                <td>{{ plan.date }}</td>
+                <td>{{ plan.country }}</td>
+                <td>{{ plan.company }}</td>
+                <td>{{ plan.contract_electrical }}</td>
+                <td>{{ plan.fee_type }}</td>
+                <td>{{ plan.fee_name }}</td>
+                <td>{{ plan.start_time }}</td>
+                <td>{{ plan.end_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal para Seleccionar Plan -->
+    <div id="modalModificar" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Select Plan</h3>
+            <form id="modificarForm" method="POST" action="/select_plan">
+                <div class="mb-3">
+                    {% if errors.select_plan %}
+                    <p style="color: red;">{{errors.select_plan}}</p>
+                    {% endif %}
+                    <select class="form-select mx-auto w-auto" id="select_plan" name="select_plan">
+                        <option disabled selected>Fee name</option>
+                        {% for plan in plans %}
+        
+                            <option value="{{ plan['fee_name'] }}">{{ plan['fee_name'] }}</option>
+        
+                        {% endfor %}
+        
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Load Plan</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal_edit_plan" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Edit Plan</h3>
+            <form id="edit_plan" method="POST" action="/edit_plan">
+                <div class="mb-3">
+                    {% if errors.fee_name or errors.fee_name_not_exist %}
+                        <p style="color: red;">{{errors.fee_name if errors.fee_name else errors.fee_name_not_exist}}</p>
+                    {% endif %}
+                    <input id="fee_name" name="fee_name" required type="text" class="form-control" value="{{ plan['fee_name'] }}" readonly>
+                </div>
+                <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input id="date" name="date" required type="date" class="form-control" value="{{ plan['date'] }}">
+                </div>
+                <div class="mb-3">
+                    {% if errors.country or errors.country_not_exist %}
+                        <p style="color: red;">{{errors.country if errors.country else errors.country_not_exist}}</p>
+                    {% endif %}
+                    <input id="country" name="country" required type="text" oninput="capitalizeFirstLetter(this)" maxlength="14" class="form-control" value="{{ plan['country'] }}">
+                </div>
+                <div class="mb-3">
+                    {% if errors.company or errors.company_not_exist %}
+                        <p style="color: red;">{{errors.company if errors.company else errors.company_not_exist}}</p>
+                    {% endif %}
+                    <input id="company" name="company" required type="text" oninput="capitalizeFirstLetter(this)" maxlength="50" class="form-control" value="{{ plan['company'] }}">
+                </div>
+                <div class="mb-3">
+                    {% if errors.contract_electrical or errors.contract_electrical_not_exist %}
+                        <p style="color: red;">{{errors.contract_electrical if errors.contract_electrical else errors.contract_electrical_not_exist}}</p>
+                    {% endif %}
+                    <input id="contract_electrical" name="contract_electrical" required type="text" oninput="capitalizeFirstLetter(this)" maxlength="20" class="form-control" value="{{ plan['contract_electrical'] }}">
+                </div>
+                <div class="mb-3">
+                    {% if errors.fee_type or errors.fee_type_not_exist %}
+                        <p style="color: red;">{{errors.fee_type if errors.fee_type else errors.fee_type_not_exist}}</p>
+                    {% endif %}
+                    <input id="fee_type" name="fee_type" required type="text" oninput="capitalizeFirstLetter(this)" maxlength="20" class="form-control" value="{{ plan['fee_type'] }}">
+                </div>
+                <div class="mb-3">
+                    {% if errors.start_time or errors.start_time_not_exist %}
+                        <p style="color: red;">{{errors.start_time if errors.start_time else errors.start_time_not_exist}}</p>
+                    {% endif %}
+                    <input id="start_time" name="start_time" required type="time" class="form-control" value="{{ plan['start_time'] }}">
+                </div>
+                <div class="mb-3">
+                    {% if errors.end_time or errors.end_time_not_exist %}
+                        <p style="color: red;">{{errors.end_time if errors.end_time else errors.end_time_not_exist}}</p>
+                    {% endif %}
+                    <input id="end_time" name="end_time" required type="time" class="form-control" value="{{ plan['end_time'] }}">
+                </div>
+                <button class="btn btn-primary" type="submit">Update Data</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Registrar Nuevo Plan -->
+    <div id="modalRegistrar" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Register New Plan</h3>
+            <form id="registrarForm" action="/energy_cost" method="post">
+                <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date" name="date" required type="date">
+                </div>
+                <div class="mb-3">
+                    {% if errors.country or errors.country_not_exist %}
+                        <p style="color: red;">{{errors.country if errors.country else errors.country_not_exist}}</p>
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="country" name="country" required placeholder="country" type="text" oninput="capitalizeFirstLetter(this)" maxlength="14">
+                </div>
+                <div class="mb-3">
+                    {% if errors.company or errors.company_not_exist %}
+                        <p style="color: red;">{{errors.company if errors.company else errors.company_not_exist}}</p>
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="company" name="company" required placeholder="company" type="text" oninput="capitalizeFirstLetter(this)" maxlength="50">
+                </div>
+                <div class="mb-3">
+                    {% if errors.contract_electrical or errors.contract_electrical_not_exist %}
+                        <p style="color: red;">{{errors.contract_electrical if errors.contract_electrical else errors.contract_electrical_not_exist}}</p>
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="contract_electrical" name="contract_electrical" required placeholder="contract electrical" type="text" oninput="capitalizeFirstLetter(this)" maxlength="20">
+                </div>
+                <div class="mb-3">
+                    {% if errors.fee_type or errors.fee_type_not_exist %}
+                        <p style="color: red;">{{errors.fee_type if errors.fee_type else errors.fee_type_not_exist}}</p>
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="fee_type" name="fee_type" required placeholder="fee type" type="text" oninput="capitalizeFirstLetter(this)" maxlength="20">
+                </div>
+                <div class="mb-3">
+                    {% if errors.fee_name or errors.fee_name_not_exist %}
+                        <p style="color: red;">{{errors.fee_name if errors.fee_name else errors.fee_name_not_exist}}</p>
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="fee_name" name="fee_name" required placeholder="fee name" type="text" oninput="capitalizeFirstLetter(this)" maxlength="20">
+                </div>
+                <div class="mb-3">
+                    {% if errors.start_time or errors.start_time_not_exist %}
+                        <p style="color: red;">{{errors.start_time if errors.start_time else errors.start_time_not_exist}}</p>
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="start_time" name="start_time" required type="time">
+                </div>
+                <div class="mb-3">
+                    {% if errors.end_time or errors.end_time_not_exist %}
+                        <p style="color: red;">{{errors.end_time if errors.end_time else errors.end_time_not_exist}}</p>
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="end_time" name="end_time" required type="time">
+                </div>
+                <button class="btn btn-primary" type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script>
+
+        
+        function capitalizeFirstLetter(input) {
+            let value = input.value;
+            input.value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+            }
+
+        // Obtener los modales
+        var modalModificar = document.getElementById("modalModificar");
+        var modalRegistrar = document.getElementById("modalRegistrar");
+
+        // Obtener los botones que abren los modales
+        var btnModificar = document.getElementById("openModalModificarBtn");
+        var btnRegistrar = document.getElementById("openModalRegistrarBtn");
+
+        // Obtener los <span> que cierran los modales
+        var span = document.getElementsByClassName("close");
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const modalModificar = document.getElementById("modalModificar");
+            const modalRegistrar = document.getElementById("modalRegistrar");
+            const btnModificar = document.getElementById("openModalModificarBtn");
+            const btnRegistrar = document.getElementById("openModalRegistrarBtn");
+
+            // Funcionalidad para abrir modales
+            btnModificar.addEventListener("click", () => {
+             modalModificar.style.display = "block";
+            });
+
+            btnRegistrar.addEventListener("click", () => {
+                modalRegistrar.style.display = "block";
+            });
+
+            // Funcionalidad para cerrar modales
+            document.querySelectorAll(".close").forEach(closeBtn => {
+                closeBtn.addEventListener("click", () => {
+                closeBtn.closest(".modal").style.display = "none";
+                });
+            });
+
+            // Cerrar modal al hacer clic fuera de él
+            window.addEventListener("click", event => {
+                if (event.target === modalModificar) {
+                    modalModificar.style.display = "none";
+                }
+                if (event.target === modalRegistrar) {
+                    modalRegistrar.style.display = "none";
+                }
+            });
+        });
+        
+        //Carga de Modales en Base al Estado
+        const modalToOpen = "{{ modal_to_open }}";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (modalToOpen === "edit") {
+                document.getElementById("modal_edit_plan").style.display = "block";
+            } else if (modalToOpen === "register") {
+                document.getElementById("modalRegistrar").style.display = "block";
+            }
+         });
+
+    </script>
+
+{% endblock %}
