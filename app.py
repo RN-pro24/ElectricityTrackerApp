@@ -70,11 +70,11 @@ def register():
             hashed_password = generate_password_hash(password)
 
             helpers.insert_db("INSERT INTO users(first_name, last_name, email, user_name, password) VALUES (%s,%s,%s,%s,%s)",
-                               first_name, last_name, email, user_name,hashed_password
+                               (first_name, last_name, email, user_name,hashed_password)
                               )
             
             user_data = helpers.query_db(
-                    "SELECT * FROM users WHERE user_name = %s", user_name
+                    "SELECT * FROM users WHERE user_name = %s", (user_name,)
                 )
         
             session["user_id"] = user_data[0]["id"]
@@ -84,7 +84,7 @@ def register():
         else:
             return render_template("register.html", errors= errors)
     else:
-        return render_template("register.html", errors={})
+        return render_template("register.html", errors= {})
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -130,9 +130,61 @@ def logout():
     return redirect("/")
 
 
-@app.route('/modificar_plan', methods=['POST'])
+@app.route('/plans', methods=['GET'])
+def view_all_plans():
+
+    plans = helpers.query_db("SELECT * FROM energetic_cost WHERE user_id = %s", (session["user_id"],))
+
+    #Si existe el plan lo envia
+    if plans:
+        return render_template('energy_cost.html', plans=plans)
+    
+    #Si no existe lo envia al modal de registro
+    else:
+        flash("You don't have plans, please register one")
+        return render_template('energy_cost.html', plans=[], modal_to_open="modalRegistrar")
+
+
+@app.route('/modificar_plan', methods=['GET','POST'])
 def modificar_plan():
-    plan = consultar_plan(request.form.get('select_plan'))
-    return render_template('index.html', plan=plan, modal_to_open="edit")
+
+    plans = helpers.query_db("SELECT * FROM energetic_cost WHERE user_id = %s", (session["user_id"],))
+
+    if request.method == "GET":
+
+        if plans:
+            flash("Select plan to modify")
+            return render_template('energy_cost.html', plans=plans ,modal_to_open="modalModificar")
+        
+        else:
+            flash("You don't have plans, please register one")
+            return render_template('energy_cost.html', plans=[], modal_to_open="modalRegistrar")
+    
+    if request.method == "POST":
+        errors= {}
+        select_plan = request.form.get("select_plan")
+        
+        if plans:
+            
+            if not select_plan or not any(plan["fee_name"] == select_plan for plan in plans):
+                errors["select_plan"] = "The plan is missing or does not exist"
+                flash("Please try again")
+                return render_template('energy_cost.html',errors=errors , plans=plans, modal_to_open="modalModificar")
+            
+
+            plan = next((plan for plan in plans if plan["fee_name"] == select_plan), None)
+            return render_template('energy_cost.html', plan=plan, modal_to_open="modal_edit_plan")
+            
+                
+        else:
+            flash("You don't have plans, please register one")
+            return render_template('energy_cost.html', plans=[], modal_to_open="modalRegistrar")
+
+    
+    
+        
+
+
+    
 
 

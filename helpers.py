@@ -57,7 +57,7 @@ def validate_new_user_data(form_data):
 
     request_user = form_data.get("user_name")
     try:
-        if query_db("SELECT * FROM users WHERE user_name = %s", request_user):
+        if query_db("SELECT * FROM users WHERE user_name = %s", (request_user,)):
             errors["user_exist"] = "The username exists"
     except Exception as e:
             errors["database_error"] = f"An error occurred: {e}"
@@ -83,7 +83,7 @@ def validate_user_data(form_data):
     
     # Query database for username
     user_data = query_db(
-        "SELECT * FROM users WHERE user_name = %s", form_data.get("username")
+        "SELECT * FROM users WHERE user_name = %s", (form_data.get("username"),)
     )
 
     # Ensure username exists and password is correct
