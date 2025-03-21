@@ -1,5 +1,6 @@
 import mysql.connector
 from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
 
 #Conect with mySQL database
 def connect_db():
@@ -95,3 +96,62 @@ def validate_user_data(form_data):
     
     else:
         return errors, user_data
+
+def validate_energy_cost_register(form_data, user, type_validate):
+    errors = {}
+
+    #Comprueba la existencia de la fecha y la validez de la fecha
+    if not form_data.get("date"):
+        errors["date"] = "Must provide date"
+    try:
+        date_object = datetime.strptime(form_data.get("date"), "%Y-%m-%d").date()
+    except ValueError:
+            errors["invalid_date"] = "Must provide valid date"
+
+    #Comprueba el pais
+    if not form_data.get("country"):
+        errors["country"] = "Must provide country"
+    #Comprueba la compañia
+    if not form_data.get("company"):
+        errors["company"] = "Must provide company"
+    #Comprueba la existencia del contrato
+    if not form_data.get("contract_electrical"):
+        errors["contract_electrical"] = "Must provide contract electrical"
+    #Comprueba la existencia del tipo de fee
+    if not form_data.get("fee_type"):
+        errors["fee_type"] = "Must provide fee type"
+    #Comprueba la existencia del nombre
+    if not form_data.get("fee_name"):
+        errors["fee_name"] = "Must provide fee name"
+    if not form_data.get("start_time"):
+        errors["start_time"] = "Must provide start time"
+    if not form_data.get("end_time"):
+        errors["end_time"] = "Must provide end time"
+
+    if not form_data.get("price_per_kWh"):
+        errors["price"] = "Must provide price_per_kWh"
+    
+    try:
+        amount = float(form_data.get("price_per_kWh"))
+    except ValueError:
+        errors["errors.price_not_number"] = "Is not a number"
+    
+    if errors:
+        return errors
+    
+    if type_validate == "register":
+
+        try:
+            query_fee_name = form_data.get("fee_name")
+            query_fee_name = query_fee_name.strip()
+            if query_db( "SELECT fee_name FROM energetic_cost WHERE user_id = %s AND fee_name = %s",
+                        (user, query_fee_name)
+                        ):
+                errors["fee_name_exist"] = "Fee name already exist"
+
+        except Exception as e:
+                errors["database_error"] = f"An error occurred: {e}"
+
+    return errors if errors else None
+
+
