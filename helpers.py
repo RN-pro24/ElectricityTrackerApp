@@ -97,7 +97,7 @@ def validate_user_data(form_data):
     else:
         return errors, user_data
 
-def validate_energy_cost_register(form_data, user, type_validate):
+def validate_energy_cost_register(form_data, user, type_validate, fee_id=None):
     errors = {}
 
     #Comprueba la existencia de la fecha y la validez de la fecha
@@ -123,22 +123,26 @@ def validate_energy_cost_register(form_data, user, type_validate):
     #Comprueba la existencia del nombre
     if not form_data.get("fee_name"):
         errors["fee_name"] = "Must provide fee name"
+    #Comprueba la hora inicial del plan
     if not form_data.get("start_time"):
         errors["start_time"] = "Must provide start time"
+    #comprueba la hora final del plan
     if not form_data.get("end_time"):
         errors["end_time"] = "Must provide end time"
-
+    #Comprueba el precio por kwh
     if not form_data.get("price_per_kWh"):
         errors["price"] = "Must provide price_per_kWh"
-    
+    #Comprueba que el precio este en el margen correcto
     try:
         amount = float(form_data.get("price_per_kWh"))
     except ValueError:
         errors["errors.price_not_number"] = "Is not a number"
     
+    #Si existen errores los envia
     if errors:
         return errors
-    
+
+    #Si es el registro inicial entonces valida que no este repetido    
     if type_validate == "register":
 
         try:
@@ -151,6 +155,12 @@ def validate_energy_cost_register(form_data, user, type_validate):
 
         except Exception as e:
                 errors["database_error"] = f"An error occurred: {e}"
+    
+    #Si es edicion del plan, este proceso confirma que es el mismo nombre del plan
+    if type_validate == "edit":
+        actually_fee_name = query_db("SELECT fee_name FROM energetic_cost WHERE user_id = %s AND id = %s", (fee_id, user))
+        if actually_fee_name != form_data.get("fee_name"):
+            errors["fee_name"] = "The name must not be changed"
 
     return errors if errors else None
 

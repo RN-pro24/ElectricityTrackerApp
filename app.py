@@ -182,14 +182,22 @@ def select_plan():
         
 @app.route('/edit_plan', methods=['GET','POST'])
 def edit_plan():
+    #Declarar variable para uso de ambos metodos
+    fee_id = None
+    fee_name = ""
+    
 
     if request.method == "POST":
         
-        errors = helpers.validate_energy_cost_register(request.form, session["user_id"], "edit")
+        errors = helpers.validate_energy_cost_register(request.form, session["user_id"], "edit", fee_id)
 
         if not errors:
             ...
+
         else:
-            return render_template('energy_cost.html', plan=request.form, errors={} , modal_to_open="modal_edit_plan")
+            return render_template('energy_cost.html', plan=request.form, errors=errors , modal_to_open="modal_edit_plan")
+    
+    else:
 
-
+        fee_name = request.form.get("fee_name")
+        fee_id = helpers.query_db("SELECT id FROM energetic_cost WHERE fee_name = %s", (fee_name,))
