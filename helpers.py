@@ -159,9 +159,40 @@ def validate_energy_cost_register(form_data, user, type_validate, fee_id=None):
     #Si es edicion del plan, este proceso confirma que es el mismo nombre del plan
     if type_validate == "edit":
         actually_fee_name = query_db("SELECT fee_name FROM energetic_cost WHERE user_id = %s AND id = %s", (fee_id, user))
-        if actually_fee_name != form_data.get("fee_name"):
+        if actually_fee_name and actually_fee_name[0]["fee_name"] != form_data.get("fee_name"):
             errors["fee_name"] = "The name must not be changed"
 
     return errors if errors else None
 
+def update_energy_cost_values(user, form_data):
+    errors = {}
 
+    query = """
+    UPDATE energetic_cost
+    SET
+        country = %s,
+        date = %s,
+        company = %s,
+        contract_electrical = %s,
+        fee_type = %s,
+        start_time = %s,
+        end_time = %s,
+        price_per_kWh = %s,
+        modified = %s
+    WHERE
+        user_id = %s 
+    AND
+        fee_name = %s
+    """
+
+    values = (form_data.get("country"),form_data.get("date"),form_data.get("company"), form_data.get("contract_electrical"),
+              form_data.get("fee_type"),form_data.get("start_time"),form_data.get("end_time"),form_data.get("price_per_kWh"),
+              datetime.now(), user, form_data.get("fee_name"))
+
+    try:
+        query_db(query,values)
+
+    except Exception as e:
+        errors["database_error"] = f"An error occurred: {e}"
+    
+    return errors if errors else None

@@ -192,7 +192,16 @@ def edit_plan():
         errors = helpers.validate_energy_cost_register(request.form, session["user_id"], "edit", fee_id)
 
         if not errors:
-            ...
+            try:
+                if helpers.update_energy_cost_values(session["user_id"], request.form):
+                    flash("Update complete")
+                    return render_template('energy_cost.html', plans=[], errors={} , plan=None)
+
+            
+            except Exception as e:
+                errors["database_error"] = f"An error occurred: {e}"
+            
+            return errors if errors else render_template('energy_cost.html', plan=request.form, errors=errors , modal_to_open="modal_edit_plan")
 
         else:
             return render_template('energy_cost.html', plan=request.form, errors=errors , modal_to_open="modal_edit_plan")
