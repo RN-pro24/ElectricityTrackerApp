@@ -134,6 +134,13 @@
                     {% endif %}
                     <input id="price_per_kWh" name="price_per_kWh" required type="number" class="form-control" value="{{ plan['price_per_kWh'] }}" min="0" step="0.01">
                 </div>
+                <div class="mb-3">
+                    {% if errors.status or errors.status_not_valid %}
+                        <p style="color: red;">{{errors.status if errors.status else errors.status_not_valid}}</p>
+                    {% endif %}
+                    <input id="status" name="status" required type="text" class="form-control" value="{{ plan['status'] }}" oninput="capitalizeFirstLetter(this)" maxlength="20" class="form-control">
+                </div>
+                <p style="color: rgb(12, 11, 11);">If the plan is associated with gadgets, it cannot be deactivated.</p>
                 <button class="btn btn-primary" type="submit">Update Data</button>
             </form>
         </div>
@@ -145,7 +152,7 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h3>Register New Plan</h3>
-            <form id="registrarForm" action="/energy_cost" method="post">
+            <form id="register_plan" action="/register_plan" method="post">
                 <div class="mb-3">
                     {% if errors.date or errors.invalid_date %}
                         <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
@@ -199,6 +206,12 @@
                         <p style="color: red;">{{errors.price if errors.price else errors.price_not_number}}</p>
                     {% endif %}
                     <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="price_per_kWh" name="price_per_kWh" placeholder="amount" required type="number" class="form-control" min="0" step="0.01">
+                </div>
+                <div class="mb-3">
+                    {% if errors.status or errors.status_not_valid %}
+                        <p style="color: red;">{{errors.status if errors.status else errors.status_not_valid}}</p>
+                    {% endif %}
+                    <input id="status" name="status" required type="text" class="form-control" value="Active" oninput="capitalizeFirstLetter(this)" maxlength="20" class="form-control">
                 </div>
                 <button class="btn btn-primary" type="submit">Register</button>
             </form>

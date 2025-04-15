@@ -186,27 +186,60 @@ def edit_plan():
     fee_id = None
     fee_name = ""
     
+    #Si el usuario envia el formulario
 
     if request.method == "POST":
-        
+
+        #Se detectan errores en caso de existir        
         errors = helpers.validate_energy_cost_register(request.form, session["user_id"], "edit", fee_id)
 
+        #Si no existen errores intenta actualizar la informacion
         if not errors:
             try:
                 if helpers.update_energy_cost_values(session["user_id"], request.form):
+                    #Notifica la actualizacion y regresa a la pantalla inicial
                     flash("Update complete")
                     return render_template('energy_cost.html', plans=[], errors={} , plan=None)
 
-            
+            #Si se obtiene un error lo capta 
             except Exception as e:
                 errors["database_error"] = f"An error occurred: {e}"
             
-            return errors if errors else render_template('energy_cost.html', plan=request.form, errors=errors , modal_to_open="modal_edit_plan")
+            #Si existe un error envia el error de lo contrario renderiza la pantalla con
+            if errors:
+                return render_template('energy_cost.html', plan=request.form, errors=errors , modal_to_open="modal_edit_plan")
 
         else:
             return render_template('energy_cost.html', plan=request.form, errors=errors , modal_to_open="modal_edit_plan")
     
+    #Si el metodo es GET entonces asigna fee_name y fee_id
     else:
 
         fee_name = request.form.get("fee_name")
         fee_id = helpers.query_db("SELECT id FROM energetic_cost WHERE fee_name = %s", (fee_name,))
+
+@app.route('/register_plan' , methods=['GET','POST'])
+def register_plan():
+
+    errors = {}
+    
+    if request.method == "POST":
+        errors = helpers.validate_energy_cost_register(request.form, session['user_id'],"register")
+
+        if not errors:
+
+            try:
+                print("ant help")
+                if helpers.register_energy_cost_values(session['user_id'], request.form):
+                    flash("Register Complete")
+                    return render_template('energy_cost.html', plans=[], errors={} , plan=None)
+                else:
+                    errors["registration_failed"] = "Unable to complete registration."
+
+            except Exception as e:
+                errors["database_error"] = f"An error occurred: {e}"
+            
+        return render_template('energy_cost.html', errors=errors, modal_to_open="modalRegistrar")
+
+    else:
+        return render_template('energy_cost.html', errors={})

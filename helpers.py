@@ -137,6 +137,13 @@ def validate_energy_cost_register(form_data, user, type_validate, fee_id=None):
         amount = float(form_data.get("price_per_kWh"))
     except ValueError:
         errors["errors.price_not_number"] = "Is not a number"
+    #Comprueba el estatus
+    if not form_data.get("status"):
+        errors["status"] = "Must provide status active or inactive"
+
+    if form_data.get("status") not in ["Active", "Inactive"]:
+        errors["status_not_valid"] = "Must provide status active or inactive"
+
     
     #Si existen errores los envia
     if errors:
@@ -178,7 +185,8 @@ def update_energy_cost_values(user, form_data):
         start_time = %s,
         end_time = %s,
         price_per_kWh = %s,
-        modified = %s
+        modified = %s,
+        status = %s
     WHERE
         user_id = %s 
     AND
@@ -187,12 +195,48 @@ def update_energy_cost_values(user, form_data):
 
     values = (form_data.get("country"),form_data.get("date"),form_data.get("company"), form_data.get("contract_electrical"),
               form_data.get("fee_type"),form_data.get("start_time"),form_data.get("end_time"),form_data.get("price_per_kWh"),
-              datetime.now(), user, form_data.get("fee_name"))
+              datetime.now(), user, form_data.get("fee_name"), form_data.get("status"))
 
     try:
-        query_db(query,values)
+        insert_db(query,values)
 
     except Exception as e:
         errors["database_error"] = f"An error occurred: {e}"
     
     return errors if errors else None
+
+def register_energy_cost_values(user, form_data):
+    errors = {}
+
+    query = """
+    INSERT INTO energetic_cost
+    (
+        user_id,
+        country,
+        date,
+        company,
+        contract_electrical,
+        fee_type,
+        fee_name,
+        start_time,
+        end_time,
+        price_per_kWh,
+        modified,
+        status
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+    """
+
+    values = (user, form_data.get("country"),form_data.get("date"),form_data.get("company"), form_data.get("contract_electrical"),
+              form_data.get("fee_type"), form_data.get("fee_name"), form_data.get("start_time"),form_data.get("end_time"),form_data.get("price_per_kWh"),
+              datetime.now(), form_data.get("status"))
+
+    try:
+        print("ant queryy")
+        insert_db(query,values)
+        print("listo")
+
+    except Exception as e:
+        errors["database_error"] = f"An error occurred: {e}"
+    
+    return errors if errors else True
