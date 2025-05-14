@@ -164,14 +164,12 @@ def select_plan():
         errors= {}
         select_plan = request.form.get("select_plan")
         
-        if plans:
-            
+        if plans:    
             if not select_plan or not any(plan["fee_name"] == select_plan for plan in plans):
                 errors["select_plan"] = "The plan is missing or does not exist"
                 flash("Please try again")
                 return render_template('energy_cost.html',errors=errors , plans=plans, modal_to_open="modalModificar", plan=None)
             
-
             plan = next((plan for plan in plans if plan["fee_name"] == select_plan), None)
             return render_template('energy_cost.html', plan=plan, errors={} , modal_to_open="modal_edit_plan")
             
@@ -199,7 +197,8 @@ def edit_plan():
                 if helpers.update_energy_cost_values(session["user_id"], request.form):
                     #Notifica la actualizacion y regresa a la pantalla inicial
                     flash("Update complete")
-                    return render_template('energy_cost.html', plans=[], errors={} , plan=None)
+                    return redirect('/plans') 
+                    #return render_template('energy_cost.html', plans=[], errors={} , plan=None)
 
             #Si se obtiene un error lo capta 
             except Exception as e:
@@ -229,7 +228,6 @@ def register_plan():
         if not errors:
 
             try:
-                print("ant help")
                 if helpers.register_energy_cost_values(session['user_id'], request.form):
                     flash("Register Complete")
                     return render_template('energy_cost.html', plans=[], errors={} , plan=None)

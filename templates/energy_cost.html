@@ -221,7 +221,13 @@
     <script src="scripts.js"></script>
     <script>
 
-        
+        document.addEventListener("DOMContentLoaded", function() {
+        var modalToOpen = "{{ modal_to_open }}";
+        if (modalToOpen === "modal_edit_plan") {
+            document.getElementById("modal_edit_plan").style.display = "block";
+        }
+        });
+
         function capitalizeFirstLetter(input) {
             let value = input.value;
             input.value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();

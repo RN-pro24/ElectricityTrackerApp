@@ -23,12 +23,20 @@ def query_db(query, parameters=None):
 
 #insert data en database
 def insert_db(query, data):
-    mydb = connect_db()
-    mycursor = mydb.cursor()
-    mycursor.execute(query, data)
-    mydb.commit()
-    mycursor.close()
-    mydb.close()
+    try:
+        mydb = connect_db()
+        mycursor = mydb.cursor()
+        mycursor.execute(query, data)
+        mydb.commit()
+        mycursor.close()
+        mydb.close()
+        return True
+    
+    except Exception as e:
+        print(f"Database error: {e}")
+
+        return None
+
 
 #Validation for new users
 
@@ -195,15 +203,12 @@ def update_energy_cost_values(user, form_data):
 
     values = (form_data.get("country"),form_data.get("date"),form_data.get("company"), form_data.get("contract_electrical"),
               form_data.get("fee_type"),form_data.get("start_time"),form_data.get("end_time"),form_data.get("price_per_kWh"),
-              datetime.now(), user, form_data.get("fee_name"), form_data.get("status"))
+              datetime.now(), form_data.get("status"), user, form_data.get("fee_name"))
 
-    try:
-        insert_db(query,values)
-
-    except Exception as e:
-        errors["database_error"] = f"An error occurred: {e}"
-    
-    return errors if errors else None
+    if insert_db(query,values):
+        return True
+    else:
+        return None
 
 def register_energy_cost_values(user, form_data):
     errors = {}
