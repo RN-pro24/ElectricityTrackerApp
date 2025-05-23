@@ -48,6 +48,9 @@ def after_request(response):
 def home():
     return render_template('index.html')
 
+
+"""Manejos de usuarios"""
+
 #Register new user
 @app.route("/register", methods=["GET","POST"])
 def register():
@@ -128,6 +131,9 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
+
+
+"""Creacion y desarrollo de planes"""
 
 
 @app.route('/plans', methods=['GET'])
@@ -241,3 +247,20 @@ def register_plan():
 
     else:
         return render_template('energy_cost.html', errors={})
+    
+
+"""Creacion y desarrollo de gadgets"""
+
+@app.route('/gadgets', methods=['GET'])
+def view_all_plans():
+
+    gadgets = helpers.query_db("SELECT * FROM gadgets WHERE user_id = %s", (session["user_id"],))
+
+    #Si existe el plan lo envia
+    if gadgets:
+        return render_template('gadgets.html', gadgets=gadgets, errors={}, gadget=None)
+    
+    #Si no existe lo envia al modal de registro
+    else:
+        flash("You don't have gadgets, please register one")
+        return render_template('gadgets.html', gadgets=[], modal_to_open="modalRegistrar", errors={}, gadget=None)
