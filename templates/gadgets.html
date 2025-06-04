@@ -13,7 +13,7 @@
     <a href="/gadgets" class="btn btn-success">View all Gadgets</a>
 
     <div class="button-group">
-        <button id="boton_modificar_gadget" class="btn btn-secondary">Modify Gadget</button>
+        <button id="boton_modificar_gadget" class="btn btn-secondary" style="margin-right: 10px;">Modify Gadget</button>
         <button id="boton_registrar_gadget" class="btn btn-primary">Register Gadget</button>
     </div>
     
@@ -86,20 +86,21 @@
             <h3>Edit Gadget</h3>
             <form id="edit_gadget" method="POST" action="/edit_gadget">
                 <div class="mb-3">
-                    {% if errors.gadget_name or errors.gadget_name_not_exist %}
-                        <p style="color: red;">{{errors.gadget_name if errors.gadget_name else errors.gadget_name_not_exist}}</p>
-                    {% endif %}
-                    <input id="gadget_name" name="gadget_name" required type="text" class="form-control" value="{{ gadget['gadget_name'] if gadget }}" readonly>
-                </div>
-                <div class="mb-3">
                     {% if errors.date or errors.invalid_date %}
                         <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
                     {% endif %}
                     <input id="date" name="date" required type="date" class="form-control" value="{{ gadget['date'] }}">
                 </div>
                 <div class="mb-3">
+                    {% if errors.gadget_name or errors.gadget_name_not_exist %}
+                        <p style="color: red;">{{errors.gadget_name if errors.gadget_name else errors.gadget_name_not_exist}}</p>
+                    {% endif %}
+                    <input id="gadget_name" name="gadget_name" required type="text" class="form-control" value="{{ gadget['gadget_name'] if gadget }}" readonly>
+                
+                </div>
+                <div class="mb-3">
                     {% if errors.watts or errors.watts_not_exist %}
-                        <p style="color: red;">{{errors.country if errors.country else errors.country_not_exist}}</p>
+                        <p style="color: red;">{{errors.watts if errors.watts else errors.watts_not_exist}}</p>
                     {% endif %}
                     <input id="watts" name="watts" required type="number" class="form-control" value="{{ gadget['watts'] }}">
                 </div>
@@ -143,10 +144,8 @@
                     {% if errors.status  or errors.status_not_valid %}
                         <p style="color: red;">{{errors.status if errors.status else errors.status_not_valid}}</p>
                     {% endif %}
-                    <input id="status" name="status" required type="text" class="form-control" value="{{ gadget['status'] }}" oninput="capitalizeFirstLetter(this)" maxlength="20" class="form-control">
+                    <input id="status" name="status" required type="text" class="form-control" value="{{ gadget['status'] }}" oninput="capitalizeFirstLetter(this)" maxlength="20" >
                 </div>
-
-                <p style="color: rgb(12, 11, 11);">If the plan is associated with gadgets, it cannot be deactivated.</p>
                 <button class="btn btn-primary" type="submit">Update Data</button>
             </form>
         </div>
@@ -157,8 +156,8 @@
     <div id="registrar_gadget" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h3>Register New Plan</h3>
-            <form id="register_plan" action="/register_plan" method="post">
+            <h3>Register New Gadget</h3>
+            <form id="register_gadget" action="/register_gadget" method="post">
                 <div class="mb-3">
                     {% if errors.date or errors.invalid_date %}
                         <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
@@ -166,58 +165,65 @@
                     <input autocomplete="off" class="form-control mx-auto w-auto" id="date" name="date" required type="date">
                 </div>
                 <div class="mb-3">
-                    {% if errors.country or errors.country_not_exist %}
-                        <p style="color: red;">{{errors.country if errors.country else errors.country_not_exist}}</p>
+                    {% if errors.gadget_name or errors.gadget_name_not_exist %}
+                        <p style="color: red;">{{errors.gadget_name if errors.gadget_name else errors.gadget_name_not_exist}}</p>
                     {% endif %}
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="country" name="country" required placeholder="country" type="text" oninput="capitalizeFirstLetter(this)" maxlength="14">
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="gadget_name" name="gadget_name" required placeholder="Gadget Name" type="text" oninput="capitalizeFirstLetter(this)" maxlength="14">
+                <p>Ensure the device name is correct, as you won't be able to modify it after registration.</p>
                 </div>
                 <div class="mb-3">
-                    {% if errors.company or errors.company_not_exist %}
-                        <p style="color: red;">{{errors.company if errors.company else errors.company_not_exist}}</p>
+                    {% if errors.watts or errors.watts_not_exist %}
+                        <p style="color: red;">{{errors.watts if errors.watts else errors.watts_not_exist}}</p>
                     {% endif %}
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="company" name="company" required placeholder="company" type="text" oninput="capitalizeFirstLetter(this)" maxlength="50">
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="watts" name="watts" required placeholder="Watts" type="number" min="0" step="0.01">
                 </div>
                 <div class="mb-3">
-                    {% if errors.contract_electrical or errors.contract_electrical_not_exist %}
-                        <p style="color: red;">{{errors.contract_electrical if errors.contract_electrical else errors.contract_electrical_not_exist}}</p>
+                    {% if errors.kWh or errors.kWh_not_exist %}
+                        <p style="color: red;">{{errors.kWh if errors.kWh else errors.kWh_not_exist}}</p>
                     {% endif %}
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="contract_electrical" name="contract_electrical" required placeholder="contract electrical" type="text" oninput="capitalizeFirstLetter(this)" maxlength="20">
+                    <input id="kWh" autocomplete="off" name="kWh" autofocus required type="number" maxlength="50" placeholder="Kwh" class="form-control mx-auto w-auto">
                 </div>
                 <div class="mb-3">
-                    {% if errors.fee_type or errors.fee_type_not_exist %}
-                        <p style="color: red;">{{errors.fee_type if errors.fee_type else errors.fee_type_not_exist}}</p>
+                    {% if errors.price_type or errors.price_type_not_exist %}
+                        <p style="color: red;">{{ errors.price_type if errors.price_type else errors.price_type_not_exist }}</p>
                     {% endif %}
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="fee_type" name="fee_type" required placeholder="fee type" type="text" oninput="capitalizeFirstLetter(this)" maxlength="20">
+                    <label for="price_type">Select Price Type:</label>
+                    <select id="price_type" name="price_type" class="form-control mx-auto w-auto">
+                        <option disabled selected>Select an option</option>
+                        {% for plan in plans %}
+                            <option value="{{ plan }}">{{ plan }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="mb-3">
-                    {% if errors.fee_name or errors.fee_name_exist %}
-                        <p style="color: red;">{{errors.fee_name if errors.fee_name else errors.fee_name_exist}}</p>
+                    {% if errors.hour_usage or errors.hour_usage_not_exist %}
+                        <p style="color: red;">{{errors.hour_usage if errors.hour_usage else errors.hour_usage_not_exist}}</p>
                     {% endif %}
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="fee_name" name="fee_name" required placeholder="fee name" type="text" oninput="capitalizeFirstLetter(this)" maxlength="20">
+                    <input id="hour_usage" name="hour_usage" required type="number" placeholder="Hour Usage" class="form-control mx-auto w-auto">
                 </div>
                 <div class="mb-3">
-                    {% if errors.start_time or errors.start_time_not_exist %}
-                        <p style="color: red;">{{errors.start_time if errors.start_time else errors.start_time_not_exist}}</p>
+                    {% if errors.electrical_efficiency or errors.electrical_efficiency_not_valid %}
+                        <p style="color: red;">{{errors.electrical_efficiency if errors.electrical_efficiency else errors.electrical_efficiency}}</p>
                     {% endif %}
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="start_time" name="start_time" required type="time">
+                    <input id="electrical_efficiency" name="electrical_efficiency" placeholder="Electrical Efficiency" required type="text" class="form-control mx-auto w-auto" oninput="capitalizeFirstLetter(this)" maxlength="20" >
                 </div>
                 <div class="mb-3">
-                    {% if errors.end_time or errors.end_time_not_exist %}
-                        <p style="color: red;">{{errors.end_time if errors.end_time else errors.end_time_not_exist}}</p>
+                    {% if errors.gadget_type  or errors.gadget_type_not_valid %}
+                        <p style="color: red;">{{errors.gadget_type if errors.gadget_type else errors.gadget_type_not_valid}}</p>
                     {% endif %}
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="end_time" name="end_time" required type="time">
+                    <input id="gadget_type" name="gadget_type" placeholder="Gadget Type"required type="text" class="form-control mx-auto w-auto" oninput="capitalizeFirstLetter(this)" maxlength="20" >
                 </div>
                 <div class="mb-3">
-                    {% if errors.price or errors.price_not_number %}
-                        <p style="color: red;">{{errors.price if errors.price else errors.price_not_number}}</p>
+                    {% if errors.house_location  or errors.house_location_not_valid %}
+                        <p style="color: red;">{{errors.house_location if errors.house_location else errors.house_location_not_valid}}</p>
                     {% endif %}
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="price_per_kWh" name="price_per_kWh" placeholder="amount" required type="number" class="form-control" min="0" step="0.01">
+                    <input id="house_location" name="house_location" placeholder="House Location" required type="text" class="form-control mx-auto w-auto"  oninput="capitalizeFirstLetter(this)" maxlength="20" >
                 </div>
                 <div class="mb-3">
-                    {% if errors.status or errors.status_not_valid %}
+                    {% if errors.status  or errors.status_not_valid %}
                         <p style="color: red;">{{errors.status if errors.status else errors.status_not_valid}}</p>
                     {% endif %}
-                    <input id="status" name="status" required type="text" class="form-control" value="Active" oninput="capitalizeFirstLetter(this)" maxlength="20" class="form-control">
+                    <input id="status" name="status" placeholder="Status" required type="text" class="form-control mx-auto w-auto" oninput="capitalizeFirstLetter(this)" maxlength="20" >
                 </div>
                 <button class="btn btn-primary" type="submit">Register</button>
             </form>
