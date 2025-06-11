@@ -245,3 +245,113 @@ def register_energy_cost_values(user, form_data):
         errors["database_error"] = f"An error occurred: {e}"
     
     return errors if errors else True
+
+
+def validate_gadget_register(form_data, user, type_validate, gadget_id=None):
+    errors = {}
+
+    #Comprueba la existencia de la fecha y la validez de la fecha
+    if not form_data.get("date"):
+        errors["date"] = "Must provide date"
+    try:
+        date_object = datetime.strptime(form_data.get("date"), "%Y-%m-%d").date()
+    except ValueError:
+            errors["invalid_date"] = "Must provide valid date"
+
+    #Comprueba watts
+    if not form_data.get("watts"):
+        errors["watts"] = "Must provide Watts"
+    #Comprueba que watts sea numero
+    try:
+        amount = float(form_data.get("watts"))
+    except ValueError:
+        errors["watts"] = "Watts is not a number"
+
+    #Comprueba kWh
+    if not form_data.get("kWh"):
+        errors["kWh"] = "Must provide kWh"
+    #Comprueba que kWh sea numero
+    try:
+        amount = float(form_data.get("kWh"))
+    except ValueError:
+        errors["kWh"] = "kWh is not a number"
+
+    #Comprueba la existencia del tipo de precio
+    if not form_data.get("price_type"):
+        errors["price_type"] = "Must provide price type"
+    #Comprueba la existencia del tiempo de uso
+    if not form_data.get("hour_usage"):
+        errors["hour_usage"] = "Must provide hour usage"
+    #Comprueba la existencia de la eficiencia
+    if not form_data.get("electrical_efficiency"):
+        errors["electrical_efficiency"] = "Must provide electrical efficiency"
+    #Comprueba el tipo de gadget
+    if not form_data.get("gadget_type"):
+        errors["gadget_type"] = "Must provide gadget type"
+    #comprueba ubicacion 
+    if not form_data.get("house_location"):
+        errors["house_location"] = "Must provide house location"
+    
+    #Comprueba el estatus
+    if not form_data.get("status"):
+        errors["status"] = "Must provide status active or inactive"
+
+    if form_data.get("status") not in ["Active", "Inactive"]:
+        errors["status_not_valid"] = "Must provide status active or inactive"
+
+    
+    #Si existen errores los envia
+    if errors:
+        return errors
+
+    #Si es el registro inicial entonces valida que no este repetido    
+    if type_validate == "register":
+
+        try:
+            query_gadget_name = form_data.get("gadget_name")
+            query_gadget_name = query_gadget_name.strip()
+            if query_db( "SELECT gadget_name FROM gadgets WHERE user_id = %s AND gadget_name = %s",
+                        (user, query_gadget_name)
+                        ):
+                errors["gadget_name"] = "Gadget name already exist"
+
+        except Exception as e:
+                errors["database_error"] = f"An error occurred: {e}"
+    
+    #Si es edicion del gadget, este proceso confirma que es el mismo nombre del gadget
+    if type_validate == "edit":
+        actually_gadget_name = query_db("SELECT gadget_name FROM gadgets WHERE user_id = %s AND id = %s", (gadget_id, user))
+        if actually_gadget_name and actually_gadget_name[0]["gadget_name"] != form_data.get("gadget_name"):
+            errors["gadget_name"] = "The name must not be changed"
+
+    return errors if errors else None
+
+def update_gadget_values(user, form_data):
+    errors = {}
+
+    query = """
+    UPDATE gadgets
+    SET
+        watts = %s,
+        kWh = %s,
+        price_type = %s,
+        hours_usage = %s,
+        electrical_efficiency = %s,
+        gadget_type = %s,
+        house_location = %s,
+        status = %s,
+        date = %s
+    WHERE
+        user_id = %s 
+    AND
+        gadget_name = %s
+    """
+    #Date en este caso es para modificaciones
+    values = (form_data.get("watts"),form_data.get("kWh"),form_data.get("price_type"), form_data.get("hours_usage"),
+              form_data.get("electrical_efficiency"),form_data.get("gadget_type"),form_data.get("house_location"),form_data.get("status"),
+              datetime.now(),user,form_data.get("gadget_name"))
+
+    if insert_db(query,values):
+        return True
+    else:
+        return None

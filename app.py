@@ -298,27 +298,26 @@ def select_gadget():
             flash("You don't have gadgets, please register one")
             return render_template('gadgets.html', gadgets=[], errors={} ,modal_to_open="registrar_gadget", plan=None)
         
-"""@app.route('/edit_plan', methods=['GET','POST'])
+@app.route('/edit_gadget', methods=['GET','POST'])
 def edit_plan():
     #Declarar variable para uso de ambos metodos
-    fee_id = None
-    fee_name = ""
+    gadget_id = None
+    gadget_name = ""
     
     #Si el usuario envia el formulario
 
     if request.method == "POST":
 
         #Se detectan errores en caso de existir        
-        errors = helpers.validate_energy_cost_register(request.form, session["user_id"], "edit", fee_id)
+        errors = helpers.validate_gadget_register(request.form, session["user_id"], "edit", gadget_id)
 
         #Si no existen errores intenta actualizar la informacion
         if not errors:
             try:
-                if helpers.update_energy_cost_values(session["user_id"], request.form):
+                if helpers.update_gadget_values(session["user_id"], request.form):
                     #Notifica la actualizacion y regresa a la pantalla inicial
                     flash("Update complete")
-                    return redirect('/plans') 
-                    #return render_template('energy_cost.html', plans=[], errors={} , plan=None)
+                    return redirect('/gadgets') 
 
             #Si se obtiene un error lo capta 
             except Exception as e:
@@ -326,13 +325,13 @@ def edit_plan():
             
             #Si existe un error envia el error de lo contrario renderiza la pantalla con
             if errors:
-                return render_template('energy_cost.html', plan=request.form, errors=errors , modal_to_open="modal_edit_plan")
+                return render_template('gadgets.html', gadget=request.form, errors=errors , modal_to_open="modal_edit_gadget")
 
         else:
-            return render_template('energy_cost.html', plan=request.form, errors=errors , modal_to_open="modal_edit_plan")
+            return render_template('gadgets.html', gadget=request.form, errors=errors , modal_to_open="modal_edit_gadget")
     
     #Si el metodo es GET entonces asigna fee_name y fee_id
     else:
 
-        fee_name = request.form.get("fee_name")
-        fee_id = helpers.query_db("SELECT id FROM energetic_cost WHERE fee_name = %s", (fee_name,))"""
+        gadget_name = request.form.get("gadget_name")
+        gadget_id = helpers.query_db("SELECT id FROM gadgets WHERE gadget_name = %s", (gadget_name,))
