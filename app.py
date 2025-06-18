@@ -274,11 +274,11 @@ def select_gadget():
 
         if gadgets:
             flash("Select gadget to modify")
-            return render_template('gadgets.html', gadgets=gadgets, errors={}, modal_to_open="modal_edit_gadget", gadget=None)
+            return render_template('gadgets.html', gadgets=gadgets, errors={}, modal_to_open="modal_edit_gadget", plans= None)
         
         else:
             flash("You don't have gadget, please register one")
-            return render_template('gadgets.html', gadgets=[], errors={} , modal_to_open="registrar_gadget", plan=None)
+            return render_template('gadgets.html', gadgets=[], errors={} , modal_to_open="registrar_gadget", plans=None)
     
     if request.method == "POST":
         errors= {}
@@ -291,7 +291,8 @@ def select_gadget():
                 return render_template('gadgets.html',errors=errors , gadgets=gadgets, modal_to_open="modal_edit_gadget", gadget=None)
             
             gadget = next((gadget for gadget in gadgets if gadget["gadget_name"] == select_plan), None)
-            return render_template('gadgets.html', gadgets=gadgets, errors={} , modal_to_open="modal_edit_gadget")
+            plans = helpers.query_db("SELECT * FROM energetic_cost WHERE user_id = %s", (session["user_id"],))
+            return render_template('gadgets.html', gadget=gadget, errors={} , modal_to_open="modal_edit_gadget", plans=plans)
             
                 
         else:
@@ -299,7 +300,7 @@ def select_gadget():
             return render_template('gadgets.html', gadgets=[], errors={} ,modal_to_open="registrar_gadget", plan=None)
         
 @app.route('/edit_gadget', methods=['GET','POST'])
-def edit_plan():
+def edit_gadget():
     #Declarar variable para uso de ambos metodos
     gadget_id = None
     gadget_name = ""
@@ -314,7 +315,7 @@ def edit_plan():
         #Si no existen errores intenta actualizar la informacion
         if not errors:
             try:
-                if helpers.update_gadget_values(session["user_id"], request.form):
+                if helpers.update_gadget_values (session["user_id"], request.form):
                     #Notifica la actualizacion y regresa a la pantalla inicial
                     flash("Update complete")
                     return redirect('/gadgets') 
@@ -335,3 +336,29 @@ def edit_plan():
 
         gadget_name = request.form.get("gadget_name")
         gadget_id = helpers.query_db("SELECT id FROM gadgets WHERE gadget_name = %s", (gadget_name,))
+
+
+@app.route('/register_gadget' , methods=['GET','POST'])
+def register_gadget():
+
+    errors = {}
+    
+    if request.method == "POST":
+        errors = helpers.validate_gadget_register(request.form, session['user_id'],"register")
+
+        if not errors:
+
+            try:
+                if helpers.register_gadgets_values(session['user_id'], request.form):
+                    flash("Register Complete")
+                    return render_template('gadgets.html', plans=[], errors={} , gadget=None, gadgets=None)
+                else:
+                    errors["registration_failed"] = "Unable to complete registration."
+
+            except Exception as e:
+                errors["database_error"] = f"An error occurred: {e}"
+            
+        return render_template('energy_cost.html', errors=errors, modal_to_open="registrar_gadget")
+
+    else:
+        return render_template('gadgets.html', errors={})

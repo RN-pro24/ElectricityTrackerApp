@@ -237,9 +237,7 @@ def register_energy_cost_values(user, form_data):
               datetime.now(), form_data.get("status"))
 
     try:
-        print("ant queryy")
         insert_db(query,values)
-        print("listo")
 
     except Exception as e:
         errors["database_error"] = f"An error occurred: {e}"
@@ -340,18 +338,54 @@ def update_gadget_values(user, form_data):
         gadget_type = %s,
         house_location = %s,
         status = %s,
-        date = %s
+        date = %s,
+        energetic_cost_id = %s
     WHERE
         user_id = %s 
     AND
         gadget_name = %s
     """
     #Date en este caso es para modificaciones
+    price_type_id = query_db("SELECT * FROM energy_cost WHERE user_id = %s AND fee_name = %s", user,form_data.get("price_type"))
     values = (form_data.get("watts"),form_data.get("kWh"),form_data.get("price_type"), form_data.get("hours_usage"),
               form_data.get("electrical_efficiency"),form_data.get("gadget_type"),form_data.get("house_location"),form_data.get("status"),
-              datetime.now(),user,form_data.get("gadget_name"))
+              datetime.now(),price_type_id,user,form_data.get("gadget_name"))
 
     if insert_db(query,values):
         return True
     else:
         return None
+    
+def register_gadgets_values(user, form_data):
+    errors = {}
+
+    query = """
+    INSERT INTO energetic_cost
+    (
+        user_id,
+        gadget_name,
+        watts,
+        kWh,
+        price_type,
+        hours_usage,
+        electrical_efficiency,
+        gadget_type,
+        house_location,
+        status,
+        energetic_cost_id,
+        date
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+    """
+    price_type_id = query_db("SELECT * FROM energy_cost WHERE user_id = %s AND fee_name = %s", user,form_data.get("price_type"))
+    values = (user, form_data.get("gadget_name"),form_data.get("watts"),form_data.get("kWh"), form_data.get("price_type"),
+              form_data.get("hours_usage"), form_data.get("electrical_efficiency"), form_data.get("gadget_type"),form_data.get("house_location"),form_data.get("status"),
+              price_type_id, form_data.get("date"))
+
+    try:
+        insert_db(query,values)
+
+    except Exception as e:
+        errors["database_error"] = f"An error occurred: {e}"
+    
+    return errors if errors else True

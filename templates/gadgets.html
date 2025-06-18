@@ -112,9 +112,15 @@
                 </div>
                 <div class="mb-3">
                     {% if errors.price_type or errors.price_type_not_exist %}
-                        <p style="color: red;">{{errors.price_type if errors.price_type else errors.price_type_not_exist}}</p>
+                        <p style="color: red;">{{ errors.price_type if errors.price_type else errors.price_type_not_exist }}</p>
                     {% endif %}
-                    <input id="price_type" name="price_type" required type="text" oninput="capitalizeFirstLetter(this)" maxlength="20" class="form-control" value="{{ gadget['price_type'] }}">
+                    <label for="price_type">Select Price Type:</label>
+                    <select id="price_type" name="price_type" class="form-control mx-auto w-auto">
+                        <option disabled selected>Select an option</option>
+                        {% for plan in plans %}
+                            <option value="{{ plan['fee_name'] }}">{{ plan['fee_name'] }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="mb-3">
                     {% if errors.hour_usage or errors.hour_usage_not_exist %}
@@ -191,7 +197,7 @@
                     <select id="price_type" name="price_type" class="form-control mx-auto w-auto">
                         <option disabled selected>Select an option</option>
                         {% for plan in plans %}
-                            <option value="{{ plan }}">{{ plan }}</option>
+                            <option value="{{ plan['fee_name'] }}">{{ plan['fee_name'] }}</option>
                         {% endfor %}
                     </select>
                 </div>
