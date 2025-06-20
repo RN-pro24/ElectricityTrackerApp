@@ -278,11 +278,12 @@ def validate_gadget_register(form_data, user, type_validate, gadget_id=None):
     if not form_data.get("price_type"):
         errors["price_type"] = "Must provide price type"
     #Comprueba la existencia del tiempo de uso
-    if not form_data.get("hour_usage"):
-        errors["hour_usage"] = "Must provide hour usage"
+    if not form_data.get("hours_usage"):
+        errors["hours_usage"] = "Must provide hour usage"
     #Comprueba la existencia de la eficiencia
-    if not form_data.get("electrical_efficiency"):
-        errors["electrical_efficiency"] = "Must provide electrical efficiency"
+    electrical_efficiency= form_data.get("electrical_efficiency")
+    if not electrical_efficiency or len(electrical_efficiency)>5:
+        errors["electrical_efficiency"] = "Must provide correct electrical efficiency"
     #Comprueba el tipo de gadget
     if not form_data.get("gadget_type"):
         errors["gadget_type"] = "Must provide gadget type"
@@ -346,10 +347,10 @@ def update_gadget_values(user, form_data):
         gadget_name = %s
     """
     #Date en este caso es para modificaciones
-    price_type_id = query_db("SELECT * FROM energy_cost WHERE user_id = %s AND fee_name = %s", user,form_data.get("price_type"))
+    price_type_id = query_db("SELECT id FROM energetic_cost WHERE user_id = %s AND fee_name = %s", user,form_data.get("price_type"))
     values = (form_data.get("watts"),form_data.get("kWh"),form_data.get("price_type"), form_data.get("hours_usage"),
               form_data.get("electrical_efficiency"),form_data.get("gadget_type"),form_data.get("house_location"),form_data.get("status"),
-              datetime.now(),price_type_id,user,form_data.get("gadget_name"))
+              datetime.now(),price_type_id[0]["id"],user,form_data.get("gadget_name"))
 
     if insert_db(query,values):
         return True
@@ -360,7 +361,7 @@ def register_gadgets_values(user, form_data):
     errors = {}
 
     query = """
-    INSERT INTO energetic_cost
+    INSERT INTO gadgets
     (
         user_id,
         gadget_name,
@@ -377,13 +378,15 @@ def register_gadgets_values(user, form_data):
     )
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
     """
-    price_type_id = query_db("SELECT * FROM energy_cost WHERE user_id = %s AND fee_name = %s", user,form_data.get("price_type"))
+    price_type_id = query_db("SELECT id FROM energetic_cost WHERE user_id = %s AND fee_name = %s", (user,form_data.get("price_type")))
     values = (user, form_data.get("gadget_name"),form_data.get("watts"),form_data.get("kWh"), form_data.get("price_type"),
               form_data.get("hours_usage"), form_data.get("electrical_efficiency"), form_data.get("gadget_type"),form_data.get("house_location"),form_data.get("status"),
-              price_type_id, form_data.get("date"))
+              price_type_id[0]["id"], form_data.get("date"))
 
     try:
+        print("AQui1")
         insert_db(query,values)
+        print("AQui2")
 
     except Exception as e:
         errors["database_error"] = f"An error occurred: {e}"

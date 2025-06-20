@@ -258,12 +258,14 @@ def view_all_gadgets():
 
     #Si existe el gadget lo envia
     if gadgets:
-        return render_template('gadgets.html', gadgets=gadgets, errors={}, gadget=None)
+        plans = helpers.query_db("SELECT * FROM energetic_cost WHERE user_id = %s", (session["user_id"],))
+        return render_template('gadgets.html', gadgets=gadgets, errors={}, gadget=None, plans=plans)
     
     #Si no existe lo envia al modal de registro
     else:
+        plans = helpers.query_db("SELECT * FROM energetic_cost WHERE user_id = %s", (session["user_id"],))
         flash("You don't have gadgets, please register one")
-        return render_template('gadgets.html', gadgets=[], modal_to_open="registrar_gadget", errors={}, gadget=None)
+        return render_template('gadgets.html', gadgets=[], modal_to_open="registrar_gadget", errors={}, gadget=None, plans=plans)
 
 @app.route('/select_gadget', methods=['GET','POST'])
 def select_gadget():
@@ -351,14 +353,14 @@ def register_gadget():
             try:
                 if helpers.register_gadgets_values(session['user_id'], request.form):
                     flash("Register Complete")
-                    return render_template('gadgets.html', plans=[], errors={} , gadget=None, gadgets=None)
+                    return render_template('gadgets.html', plans=[], errors={})
                 else:
                     errors["registration_failed"] = "Unable to complete registration."
 
             except Exception as e:
                 errors["database_error"] = f"An error occurred: {e}"
             
-        return render_template('energy_cost.html', errors=errors, modal_to_open="registrar_gadget")
+        return render_template('gadgets.html', errors=errors, modal_to_open="registrar_gadget")
 
     else:
         return render_template('gadgets.html', errors={})

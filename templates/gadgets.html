@@ -56,7 +56,7 @@
     <div id="modificar_gadget" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h3>Select Plan</h3>
+            <h3>Select Gadget</h3>
             <form id="select_plan" method="POST" action="/select_gadget">
                 <div class="mb-3">
                     {% set errors = errors or {} %}
@@ -132,7 +132,7 @@
                     {% if errors.electrical_efficiency or errors.electrical_efficiency_not_valid %}
                         <p style="color: red;">{{errors.electrical_efficiency if errors.electrical_efficiency else errors.electrical_efficiency}}</p>
                     {% endif %}
-                    <input id="electrical_efficiency" name="electrical_efficiency" required type="text" class="form-control" value="{{ gadget['electrical_efficiency'] }}" oninput="capitalizeFirstLetter(this)" maxlength="20" class="form-control">
+                    <input id="electrical_efficiency" name="electrical_efficiency" required type="text" class="form-control" value="{{ gadget['electrical_efficiency'] }}" oninput="capitalizeFirstLetter(this)" maxlength="5" class="form-control">
                 </div>
                 <div class="mb-3">
                     {% if errors.gadget_type  or errors.gadget_type_not_valid %}
@@ -187,7 +187,7 @@
                     {% if errors.kWh or errors.kWh_not_exist %}
                         <p style="color: red;">{{errors.kWh if errors.kWh else errors.kWh_not_exist}}</p>
                     {% endif %}
-                    <input id="kWh" autocomplete="off" name="kWh" autofocus required type="number" maxlength="50" placeholder="Kwh" class="form-control mx-auto w-auto">
+                    <input id="kWh" autocomplete="off" name="kWh" autofocus required type="number" maxlength="50" placeholder="Kwh" class="form-control mx-auto w-auto" min="0" step="0.01">
                 </div>
                 <div class="mb-3">
                     {% if errors.price_type or errors.price_type_not_exist %}
@@ -205,13 +205,13 @@
                     {% if errors.hour_usage or errors.hour_usage_not_exist %}
                         <p style="color: red;">{{errors.hour_usage if errors.hour_usage else errors.hour_usage_not_exist}}</p>
                     {% endif %}
-                    <input id="hour_usage" name="hour_usage" required type="number" placeholder="Hour Usage" class="form-control mx-auto w-auto">
+                    <input id="hours_usage" name="hours_usage" required type="number" placeholder="Hour Usage" class="form-control mx-auto w-auto">
                 </div>
                 <div class="mb-3">
                     {% if errors.electrical_efficiency or errors.electrical_efficiency_not_valid %}
                         <p style="color: red;">{{errors.electrical_efficiency if errors.electrical_efficiency else errors.electrical_efficiency}}</p>
                     {% endif %}
-                    <input id="electrical_efficiency" name="electrical_efficiency" placeholder="Electrical Efficiency" required type="text" class="form-control mx-auto w-auto" oninput="capitalizeFirstLetter(this)" maxlength="20" >
+                    <input id="electrical_efficiency" name="electrical_efficiency" placeholder="Electrical Efficiency" required type="text" class="form-control mx-auto w-auto" oninput="capitalizeFirstLetter(this)" maxlength="5" >
                 </div>
                 <div class="mb-3">
                     {% if errors.gadget_type  or errors.gadget_type_not_valid %}
