@@ -236,7 +236,7 @@ def register_plan():
             try:
                 if helpers.register_energy_cost_values(session['user_id'], request.form):
                     flash("Register Complete")
-                    return render_template('energy_cost.html', plans=[], errors={} , plan=None)
+                    return redirect('/plans')
                 else:
                     errors["registration_failed"] = "Unable to complete registration."
 
@@ -292,7 +292,7 @@ def select_gadget():
                 flash("Please try again")
                 return render_template('gadgets.html',errors=errors , gadgets=gadgets, modal_to_open="modal_edit_gadget", gadget=None)
             
-            gadget = next((gadget for gadget in gadgets if gadget["gadget_name"] == select_plan), None)
+            gadget = next((gadget for gadget in gadgets if gadget["gadget_name"] == select_gadget), None)
             plans = helpers.query_db("SELECT * FROM energetic_cost WHERE user_id = %s", (session["user_id"],))
             return render_template('gadgets.html', gadget=gadget, errors={} , modal_to_open="modal_edit_gadget", plans=plans)
             
@@ -353,7 +353,7 @@ def register_gadget():
             try:
                 if helpers.register_gadgets_values(session['user_id'], request.form):
                     flash("Register Complete")
-                    return render_template('gadgets.html', plans=[], errors={})
+                    return redirect('/gadgets')
                 else:
                     errors["registration_failed"] = "Unable to complete registration."
 

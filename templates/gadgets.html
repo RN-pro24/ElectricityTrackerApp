@@ -57,7 +57,7 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h3>Select Gadget</h3>
-            <form id="select_plan" method="POST" action="/select_gadget">
+            <form id="select_gadget" method="POST" action="/select_gadget">
                 <div class="mb-3">
                     {% set errors = errors or {} %}
                     {% if errors.select_gadget %}
@@ -126,7 +126,7 @@
                     {% if errors.hour_usage or errors.hour_usage_not_exist %}
                         <p style="color: red;">{{errors.hour_usage if errors.hour_usage else errors.hour_usage_not_exist}}</p>
                     {% endif %}
-                    <input id="hour_usage" name="hour_usage" required type="number" class="form-control" value="{{ gadget['hour_usage'] }}">
+                    <input id="hours_usage" name="hours_usage" required type="number" class="form-control" value="{{ gadget['hours_usage'] }}">
                 </div>
                 <div class="mb-3">
                     {% if errors.electrical_efficiency or errors.electrical_efficiency_not_valid %}
@@ -276,6 +276,21 @@
         if (event.target === registrar_gadget) registrar_gadget.style.display = "none";
     });
 });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var modalToOpen = "{{ modal_to_open }}";
+        if (modalToOpen === "modal_edit_gadget") {
+            document.getElementById("modal_edit_gadget").style.display = "block";
+        }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (modalToOpen === "edit") {
+                document.getElementById("modal_edit_gadget").style.display = "block";
+            } else if (modalToOpen === "register") {
+                document.getElementById("modalRegistrar").style.display = "block";
+            }
+         });
     </script>
 
 {% endblock %}
