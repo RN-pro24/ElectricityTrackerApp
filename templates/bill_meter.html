@@ -1,136 +1,204 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    income
+    bill_meters
 {% endblock %}
 
 {% block main %}
 
-<h1>Income</h1>
-    <form action="/income" method="post">
-        <div class="mb-3">
-            {% if errors.date or errors.invalid_date %}
-            <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" name="date" required type="date" >
+<h1>Bill Meters</h1>
+
+<p>Welcome to the Gadgets management system. Here you can manage and view your gadgets.</p>
+
+    <a href="/bill_meters" class="btn btn-success">Bill meters</a>
+
+    <div class="button-group">
+        <button id="boton_bill_analysis" class="btn btn-secondary" style="margin-right: 10px;">Bill Analysis</button>
+        <button id="boton_register_bill" class="btn btn-primary">Register Bill</button>
+    </div>
+
+
+    <!-- Tabla para mostrar los planes actuales -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Bill Number</th>
+                <th>Bill Month</th>
+                <th>Kwh consumption</th>
+                <th>Net Bill</th>
+                <th>Kwh Price</th>
+                <th>Register Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bill in bills %}
+            <tr>
+                <td>{{ bill.bill_date }}</td>
+                <td>{{ bill.bill_number }}</td>
+                <td>{{ bill.bill_month }}</td>
+                <td>{{ bill.kWh_consumption }}</td>
+                <td>{{ bill.net_bill }}</td>
+                <td>{{ bill.kWh_price }}</td>
+                <td>{{ bill.register_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal para Seleccionar Plan -->
+    <div id="bill_analysis" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Select Gadget</h3>
+            <form id="bill_analitics" method="POST" action="/bill_analitics">
+                <div class="mb-3">
+                           
+                  
+                </div>
+                <button type="submit" class="btn btn-primary">Load</button>
+            </form>
         </div>
-
-        <div class="mb-3">
-            {% if errors.amount or errors.is_not_number %}
-            <p style="color: red;">{{errors.amount if errors.amount else errors.is_not_number}}</p>
-            {% endif %}
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="amount" required placeholder="amount" type="number" min="0" step="0.01"  >
-        </div>
-
-        <div class="mb-3">
-            {% if errors.asset_accounts %}
-            <p style="color: red;">{{errors.asset_accounts}}</p>
-            {% endif %}
-            <select class="form-select mx-auto w-auto" id="asset_accounts" name="asset_accounts" onchange="toggleNameField();">
-                <option disabled selected>Assets</option>
-                {% for assest in assets %}
-                {% if assest['asset_accounts'] != "Payable" %}
-
-                    <option value="{{ assest['asset_accounts'] }}">{{ assest['asset_accounts'] }}</option>
+    </div>
 
 
+    <!-- Modal para Registrar Nuevo Plan -->
+    <div id="registrar_bill" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Register New Gadget</h3>
+            <form id="register_gadget" action="/register_gadget" method="post">
+                <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
                     {% endif %}
-                {% endfor %}
-
-            </select>
-        </div>
-
-        <div class="mb-3">
-            {% if errors.others_asset_accounts %}
-            <p style="color: red;">{{errors.others_asset_accounts}}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" id="others_asset_accounts" name="others_asset_accounts" required placeholder="others asset accounts" type="text" disabled oninput="capitalizeFirstLetter(this)" maxlength="14">
-        </div>
-
-        <div class="mb-3">
-            {% if errors.income_source_category %}
-            <p style="color: red;">{{errors.income_source_category}}</p>
-            {% endif %}
-            <select class="form-select mx-auto w-auto" id="income_source_category" name="income_source_category" onchange="toggleNameField2()">
-                <option disabled selected>Income source category</option>
-                {% for category in categorys %}
-                    {% if category['income_source_category'] != "N/A" %}
-
-                    <option value="{{ category['income_source_category'] }}">{{ category['income_source_category'] }}</option>
-
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date" name="date" required type="date">
+                </div>
+                <div class="mb-3">
+                    {% if errors.gadget_name or errors.gadget_name_not_exist %}
+                        <p style="color: red;">{{errors.gadget_name if errors.gadget_name else errors.gadget_name_not_exist}}</p>
                     {% endif %}
-                {% endfor %}
-
-            </select>
-        </div>
-
-        <div class="mb-3">
-            {% if errors.others_income_source_category %}
-            <p style="color: red;">{{errors.others_income_source_category}}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" id="others_income_source_category" name="others_income_source_category" required placeholder="others income source category" type="text" disabled oninput="capitalizeFirstLetter(this)" maxlength="14">
-        </div>
-
-        <div class="mb-3">
-            {% if errors.receivable %}
-            <p style="color: red;">{{errors.receivable}}</p>
-            {% endif %}
-            <select class="form-select mx-auto w-auto" id="receivable" name="receivable" onchange="toggleNameField3()" disabled>
-                <option disabled selected>Receivable</option>
-                {% for receivable in receivables %}
-                    {% if receivable['receivable'] != "N/A" %}
-
-                    <option value="{{ receivable['receivable'] }}">{{ receivable['receivable'] }}</option>
-
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="gadget_name" name="gadget_name" required placeholder="Gadget Name" type="text" oninput="capitalizeFirstLetter(this)" maxlength="14">
+                <p>Ensure the device name is correct, as you won't be able to modify it after registration.</p>
+                </div>
+                <div class="mb-3">
+                    {% if errors.watts or errors.watts_not_exist %}
+                        <p style="color: red;">{{errors.watts if errors.watts else errors.watts_not_exist}}</p>
                     {% endif %}
-                {% endfor %}
-
-            </select>
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="watts" name="watts" required placeholder="Watts" type="number" min="0" step="0.01">
+                </div>
+                <div class="mb-3">
+                    {% if errors.kWh or errors.kWh_not_exist %}
+                        <p style="color: red;">{{errors.kWh if errors.kWh else errors.kWh_not_exist}}</p>
+                    {% endif %}
+                    <input id="kWh" autocomplete="off" name="kWh" autofocus required type="number" maxlength="50" placeholder="Kwh" class="form-control mx-auto w-auto" min="0" step="0.01">
+                </div>
+                <div class="mb-3">
+                    {% if errors.price_type or errors.price_type_not_exist %}
+                        <p style="color: red;">{{ errors.price_type if errors.price_type else errors.price_type_not_exist }}</p>
+                    {% endif %}
+                    <label for="price_type">Select Price Type:</label>
+                    <select id="price_type" name="price_type" class="form-control mx-auto w-auto">
+                        <option disabled selected>Select an option</option>
+                        {% for plan in plans %}
+                            <option value="{{ plan['fee_name'] }}">{{ plan['fee_name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    {% if errors.hour_usage or errors.hour_usage_not_exist %}
+                        <p style="color: red;">{{errors.hour_usage if errors.hour_usage else errors.hour_usage_not_exist}}</p>
+                    {% endif %}
+                    <input id="hours_usage" name="hours_usage" required type="number" placeholder="Hour Usage" class="form-control mx-auto w-auto">
+                </div>
+                <div class="mb-3">
+                    {% if errors.electrical_efficiency or errors.electrical_efficiency_not_valid %}
+                        <p style="color: red;">{{errors.electrical_efficiency if errors.electrical_efficiency else errors.electrical_efficiency}}</p>
+                    {% endif %}
+                    <input id="electrical_efficiency" name="electrical_efficiency" placeholder="Electrical Efficiency" required type="text" class="form-control mx-auto w-auto" oninput="capitalizeFirstLetter(this)" maxlength="5" >
+                </div>
+                <div class="mb-3">
+                    {% if errors.gadget_type  or errors.gadget_type_not_valid %}
+                        <p style="color: red;">{{errors.gadget_type if errors.gadget_type else errors.gadget_type_not_valid}}</p>
+                    {% endif %}
+                    <input id="gadget_type" name="gadget_type" placeholder="Gadget Type"required type="text" class="form-control mx-auto w-auto" oninput="capitalizeFirstLetter(this)" maxlength="20" >
+                </div>
+                <div class="mb-3">
+                    {% if errors.house_location  or errors.house_location_not_valid %}
+                        <p style="color: red;">{{errors.house_location if errors.house_location else errors.house_location_not_valid}}</p>
+                    {% endif %}
+                    <input id="house_location" name="house_location" placeholder="House Location" required type="text" class="form-control mx-auto w-auto"  oninput="capitalizeFirstLetter(this)" maxlength="20" >
+                </div>
+                <div class="mb-3">
+                    {% if errors.status  or errors.status_not_valid %}
+                        <p style="color: red;">{{errors.status if errors.status else errors.status_not_valid}}</p>
+                    {% endif %}
+                    <input id="status" name="status" placeholder="Status" required type="text" class="form-control mx-auto w-auto" oninput="capitalizeFirstLetter(this)" maxlength="20" >
+                </div>
+                <button class="btn btn-primary" type="submit">Register</button>
+            </form>
         </div>
+    </div>
 
-        <div class="mb-3">
-            {% if errors.others_receivable %}
-            <p style="color: red;">{{errors.others_receivable}}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" id="others_receivable" name="others_receivable" required placeholder="others receivable" type="text" disabled oninput="capitalizeFirstLetter(this)" maxlength="14">
-        </div>
-
-        <div class="mb-3">
-            {% if errors.description %}
-            <p style="color: red;">{{errors.description}}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" name="description" required placeholder="description" type="text" >
-        </div>
-
-        <button class="btn btn-primary" type="submit">Register</button>
-    </form>
+    <script src="scripts.js"></script>
 
     <script>
-        function toggleNameField() {
-            const asset_accounts = document.getElementById("asset_accounts").value;
-            const others_asset_accounts = document.getElementById("others_asset_accounts");
-            const receivable = document.getElementById("receivable");
-            others_asset_accounts.disabled = asset_accounts !== "Others";
-            receivable.disabled = asset_accounts !== "Receivable";
-          }
 
-        function toggleNameField2() {
-            const income_source_category = document.getElementById("income_source_category").value;
-            const others_income_source_category = document.getElementById("others_income_source_category");
-            others_income_source_category.disabled = income_source_category !== "Others";
-          }
+        document.addEventListener("DOMContentLoaded", () => {
+    const modalToOpen = "{{ modal_to_open }}";
 
-        function toggleNameField3() {
-            const receivable = document.getElementById("receivable").value;
-            const others_receivable = document.getElementById("others_receivable");
-            others_receivable.disabled = receivable !== "Others";
-          }
+    // Pendiente !!!!
+    const modals = {
+        edit: document.getElementById("modal_edit_gadget"),
+        register: document.getElementById("registrar_bill")
+    };
 
-        function capitalizeFirstLetter(input) {
-            let value = input.value;
-            input.value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    if (modals[modalToOpen]) {
+        modals[modalToOpen].style.display = "block";
+    }
+
+    // Obtener botones y modales
+    const bill_analysis = document.getElementById("bill_analysis");
+    const registrar_bill = document.getElementById("registrar_bill");
+
+    const btnModificar = document.getElementById("boton_bill_analysis");
+    const btnRegistrar = document.getElementById("boton_registrar_bill");
+
+    // Abrir modales
+    btnModificar.addEventListener("click", () => bill_analysis.style.display = "block");
+    btnRegistrar.addEventListener("click", () => registrar_bill.style.display = "block");
+
+    // Cerrar modales con botón
+    document.querySelectorAll(".close").forEach(closeBtn => {
+        closeBtn.addEventListener("click", () => {
+            const modal = closeBtn.closest(".modal");
+            if (modal) modal.style.display = "none";
+        });
+    });
+
+    // Cerrar modal haciendo clic fuera
+    window.addEventListener("click", event => {
+        if (event.target === bill_analysis) bill_analysis.style.display = "none";
+        if (event.target === registrar_bill) registrar_bill.style.display = "none";
+    });
+});
+    // Pendiente !!!!
+    document.addEventListener("DOMContentLoaded", function() {
+        var modalToOpen = "{{ modal_to_open }}";
+        if (modalToOpen === "modal_edit_gadget") {
+            document.getElementById("modal_edit_gadget").style.display = "block";
+        }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (modalToOpen === "edit") {
+                document.getElementById("modal_edit_gadget").style.display = "block";
+            } else if (modalToOpen === "register") {
+                document.getElementById("modalRegistrar").style.display = "block";
             }
+         });
 
-    </script>
+</script>
+
 
 {% endblock %}
