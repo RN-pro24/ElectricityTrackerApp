@@ -364,3 +364,45 @@ def register_gadget():
 
     else:
         return render_template('gadgets.html', errors={})
+    
+    
+"""Creacion y desarrollo de bills"""
+
+@app.route('/bill_meters', methods=['GET'])
+def bill_meters():
+
+    bills = helpers.query_db("SELECT * FROM history_consumption_bill WHERE user_id = %s", (session["user_id"],))
+
+    #Si existen las facturas las envia
+    if bills:
+        return render_template('bill_meters.html', bills=bills, errors={})
+    
+    #Si no existen lo envia al modal de registro
+    else:
+        flash("You don't have bills, please register one")
+        return render_template('bill_meters.html', bills=[], modal_to_open="registrar_bill", errors={})
+
+@app.route('/register_bill', methods=['GET','POST'])
+def register_bill():
+
+    errors= {}
+
+    if request.method == "POST":
+        errors = helpers.validate_bill_register(request.form, session['user_id'])
+
+        if not errors:
+            try:
+                if helpers.register_bill(session['user_id'], request.form)
+                    flash("Register Complete")
+                    return redirect('/gadgets')
+                else:
+                     errors["registration_failed"] = "Unable to complete registration."
+                     return render_template('bill_meters.html', errors=errors, modal_to_open="registrar_bill")
+                
+            except Exception as e:
+                errors["database_error"] = f"An error occurred: {e}"
+
+        return render_template('bill_meters.html', errors=errors, modal_to_open="registrar_bill")
+    
+    else:
+        return redirect('/register_bill')
