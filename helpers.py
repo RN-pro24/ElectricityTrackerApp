@@ -384,6 +384,90 @@ def register_gadgets_values(user, form_data):
               price_type_id[0]["id"], form_data.get("date"))
 
     try:
+        insert_db(query,values)
+
+    except Exception as e:
+        errors["database_error"] = f"An error occurred: {e}"
+    
+    return errors if errors else True
+
+
+def validate_bill_register(form_data, user):
+    errors = {}
+
+    #Comprueba la existencia de la fecha y la validez de la fecha
+    if not form_data.get("date"):
+        errors["date"] = "Must provide date"
+    try:
+        date_object = datetime.strptime(form_data.get("date"), "%Y-%m-%d").date()
+    except ValueError:
+            errors["invalid_date"] = "Must provide valid date"
+
+    #Comprueba bill month
+    if not form_data.get("bill_month"):
+        errors["bill_month"] = "Must provide bill month"
+
+    #Comprueba bill number
+    if not form_data.get("bill_number"):
+        errors["bill_number"] = "Must provide bill number"
+    try:
+        amount = float(form_data.get("bill_number"))
+    except ValueError:
+        errors["bill_number"] = "bill number consumption is not a number"
+  
+    #Comprueba kwh consumption
+    if not form_data.get("kWh_consumption"):
+        errors["kWh_consumption"] = "Must provide kWh consumption"
+    #Comprueba que kWh sea numero
+    try:
+        amount = float(form_data.get("kWh_consumption"))
+    except ValueError:
+        errors["kWh_consumption"] = "kWh consumption is not a number"
+
+    #Comprueba net bill
+    if not form_data.get("net_bill"):
+        errors["net_bill"] = "Must provide net bill"
+    #Comprueba que net bill sea numero
+    try:
+        amount = float(form_data.get("net_bill"))
+    except ValueError:
+        errors["net_bill"] = "Net bill is not a number"
+
+    #Comprueba net bill
+    if not form_data.get("kWh_price"):
+        errors["kWh_price"] = "Must provide kWh price"
+    #Comprueba que net bill sea numero
+    try:
+        amount = float(form_data.get("kWh_price"))
+    except ValueError:
+        errors["kWh_price"] = "kWh price is not a number"
+
+        
+    #Si existen errores los envia
+    if errors:
+        return errors
+
+def register_bill(user, form_data):
+    errors = {}
+
+    query = """
+    INSERT INTO history_consumption_bill
+    (
+        user_id,
+        bill_date,
+        bill_number,
+        bill_month,
+        kWh_consumption,
+        net_bill,
+        kWh_price
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s);
+    """
+    
+    values = (user, form_data.get("date"),form_data.get("bill_number"),form_data.get("bill_month"), form_data.get("kWh_consumption"),
+              form_data.get("net_bill"), form_data.get("kWh_price"))
+
+    try:
         print("AQui1")
         insert_db(query,values)
         print("AQui2")

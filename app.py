@@ -406,3 +406,7 @@ def register_bill():
     
     else:
         return redirect('/register_bill')
+
+@app.route('/bill_analitics', methods=['GET','POST'])
+def bill_analitics():
+    ...
