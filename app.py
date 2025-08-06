@@ -392,7 +392,7 @@ def register_bill():
 
         if not errors:
             try:
-                if helpers.register_bill(session['user_id'], request.form)
+                if helpers.register_bill(session['user_id'], request.form):
                     flash("Register Complete")
                     return redirect('/gadgets')
                 else:
