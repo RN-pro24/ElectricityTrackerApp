@@ -368,19 +368,19 @@ def register_gadget():
     
 """Creacion y desarrollo de bills"""
 
-@app.route('/bill_meters', methods=['GET'])
+@app.route('/bill_meter', methods=['GET'])
 def bill_meters():
 
     bills = helpers.query_db("SELECT * FROM history_consumption_bill WHERE user_id = %s", (session["user_id"],))
 
     #Si existen las facturas las envia
     if bills:
-        return render_template('bill_meters.html', bills=bills, errors={})
+        return render_template('bill_meter.html', bills=bills, errors={})
     
     #Si no existen lo envia al modal de registro
     else:
         flash("You don't have bills, please register one")
-        return render_template('bill_meters.html', bills=[], modal_to_open="registrar_bill", errors={})
+        return render_template('bill_meter.html', bills=[], modal_to_open="registrar_bill", errors={})
 
 @app.route('/register_bill', methods=['GET','POST'])
 def register_bill():
@@ -394,19 +394,38 @@ def register_bill():
             try:
                 if helpers.register_bill(session['user_id'], request.form):
                     flash("Register Complete")
-                    return redirect('/gadgets')
+                    return redirect('/bill_meter')
                 else:
                      errors["registration_failed"] = "Unable to complete registration."
-                     return render_template('bill_meters.html', errors=errors, modal_to_open="registrar_bill")
+                     return render_template('bill_meter.html', errors=errors, modal_to_open="registrar_bill")
                 
             except Exception as e:
                 errors["database_error"] = f"An error occurred: {e}"
 
-        return render_template('bill_meters.html', errors=errors, modal_to_open="registrar_bill")
+        return render_template('bill_meter.html', errors=errors, modal_to_open="registrar_bill")
     
     else:
         return redirect('/register_bill')
 
 @app.route('/bill_analitics', methods=['GET','POST'])
 def bill_analitics():
-    ...
+    
+    errors= {}
+
+    if request.method == "POST":
+
+        errors = helpers.validate_bill_dates(request.form, session['user_id'])
+
+        if not errors:
+
+            bill_data = helpers.get_bill_data(request.form, session['user_id'])
+
+            try:
+                ...
+            except Exception as e:
+                errors["database_error"] = f"An error occurred: {e}"
+
+        return render_template('bill_meter.html', errors=errors, modal_to_open="bill_analitics")
+    
+    else:
+        return redirect('/bill_analitics')

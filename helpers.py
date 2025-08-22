@@ -1,6 +1,8 @@
 import mysql.connector
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from datetime import date
+
 
 #Conect with mySQL database
 def connect_db():
@@ -468,11 +470,56 @@ def register_bill(user, form_data):
               form_data.get("net_bill"), form_data.get("kWh_price"))
 
     try:
-        print("AQui1")
         insert_db(query,values)
-        print("AQui2")
 
     except Exception as e:
         errors["database_error"] = f"An error occurred: {e}"
     
     return errors if errors else True
+
+def validate_bill_dates(form_data, user):
+    errors = {}
+
+    #Comprueba la existencia de la fecha y la validez de la fecha
+    if not form_data.get("date"):
+        errors["date"] = "Must provide date"
+    try:
+        date_object = datetime.strptime(form_data.get("date"), "%Y-%m-%d").date()
+    except ValueError:
+            errors["invalid_date"] = "Must provide valid date"
+
+    #Si existen errores los envia
+    if errors:
+        return errors
+    
+    
+    if not query_db("SELECT id FROM history_consumption_bill WHERE user_id = %s AND bill_date = %s", user,form_data.get("date_1")):
+        errors["date"] = "First Date do not exist"
+    
+    if not query_db("SELECT id FROM history_consumption_bill WHERE user_id = %s AND bill_date = %s", user,form_data.get("date_2")):
+        errors["date"] = "Second Date do not exist"
+
+    date_1 = date(form_data.get("date_1"))
+    date_2 = date(form_data.get("date_2"))
+
+    if date_1 > date_2 :
+        errors["date"] = "The second date can not be more older than the first"
+    
+     #Si existen errores los envia
+    if errors:
+        return errors
+    
+def get_bill_data(form_data, user):
+
+    errors= {}
+    
+    try:
+        bill_data = query_db("SELECT * FROM history_consumption_bill WHERE user_id = %s AND bill_date BETWEEN %s AND %s", user,form_data.get("date_1"),form_data.get("date_2"))
+
+    except Exception as e:
+        errors["database_error"] = f"An error occurred: {e}"
+    
+    if not errors:
+        return bill_data
+    else:
+        return None

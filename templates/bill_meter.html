@@ -8,9 +8,9 @@
 
 <h1>Bill Meters</h1>
 
-<p>Welcome to the Gadgets management system. Here you can manage and view your gadgets.</p>
+<p>Welcome to the bill management system. Here you can manage and view your bills.</p>
 
-    <a href="/bill_meters" class="btn btn-success">Bill meters</a>
+    <a href="/bill_meter" class="btn btn-success">View all Bill</a>
 
     <div class="button-group">
         <button id="boton_bill_analysis" class="btn btn-secondary" style="margin-right: 10px;">Bill Analysis</button>
@@ -50,11 +50,21 @@
     <div id="bill_analysis" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h3>Select Gadget</h3>
+            <h3>Select details</h3>
             <form id="bill_analitics" method="POST" action="/bill_analitics">
                 <div class="mb-3">
-                           
-                  
+                    <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_1" name="date_1" required type="date">
+                    </div>
+                    <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_2" name="date_2" required type="date">
+                    </div>                  
                 </div>
                 <button type="submit" class="btn btn-primary">Load</button>
             </form>
@@ -102,7 +112,7 @@
                     {% if errors.kWh_price or errors.kWh_price_not_valid %}
                         <p style="color: red;">{{errors.kWh_price if errors.kWh_price else errors.kWh_price_not_exist}}</p>
                     {% endif %}
-                    <input id="kWh_price" name="kWh_price" placeholder="kWh Price" rrequired type="number" autofocus autocomplete="off" maxlength="50" class="form-control mx-auto w-auto" min="0" step="0.01">
+                    <input id="kWh_price" name="kWh_price" placeholder="kWh Price" required type="number" autofocus autocomplete="off" maxlength="50" class="form-control mx-auto w-auto" min="0" step="0.01">
                 </div>
                 <button class="btn btn-primary" type="submit">Register</button>
             </form>
@@ -116,9 +126,8 @@
         document.addEventListener("DOMContentLoaded", () => {
     const modalToOpen = "{{ modal_to_open }}";
 
-    // Pendiente !!!!
     const modals = {
-        edit: document.getElementById("modal_edit_gadget"),
+        edit: document.getElementById("bill_analysis"),
         register: document.getElementById("registrar_bill")
     };
 
@@ -126,18 +135,16 @@
         modals[modalToOpen].style.display = "block";
     }
 
-    // Obtener botones y modales
+    
     const bill_analysis = document.getElementById("bill_analysis");
     const registrar_bill = document.getElementById("registrar_bill");
 
     const btnModificar = document.getElementById("boton_bill_analysis");
-    const btnRegistrar = document.getElementById("boton_registrar_bill");
+    const btnRegistrar = document.getElementById("boton_register_bill");
 
-    // Abrir modales
     btnModificar.addEventListener("click", () => bill_analysis.style.display = "block");
     btnRegistrar.addEventListener("click", () => registrar_bill.style.display = "block");
 
-    // Cerrar modales con botón
     document.querySelectorAll(".close").forEach(closeBtn => {
         closeBtn.addEventListener("click", () => {
             const modal = closeBtn.closest(".modal");
@@ -145,25 +152,24 @@
         });
     });
 
-    // Cerrar modal haciendo clic fuera
     window.addEventListener("click", event => {
         if (event.target === bill_analysis) bill_analysis.style.display = "none";
         if (event.target === registrar_bill) registrar_bill.style.display = "none";
     });
 });
-    // Pendiente !!!!
+
     document.addEventListener("DOMContentLoaded", function() {
         var modalToOpen = "{{ modal_to_open }}";
-        if (modalToOpen === "modal_edit_gadget") {
-            document.getElementById("modal_edit_gadget").style.display = "block";
+        if (modalToOpen === "bill_analysis") {
+            document.getElementById("bill_analysis").style.display = "block";
         }
         });
 
         document.addEventListener("DOMContentLoaded", () => {
             if (modalToOpen === "edit") {
-                document.getElementById("modal_edit_gadget").style.display = "block";
+                document.getElementById("bill_analysis").style.display = "block";
             } else if (modalToOpen === "register") {
-                document.getElementById("modalRegistrar").style.display = "block";
+                document.getElementById("registrar_bill").style.display = "block";
             }
          });
 
