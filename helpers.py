@@ -515,20 +515,25 @@ def validate_bill_dates(form_data, user):
     if date_3 and date_4 and date_3 > date_4:
         errors["date_3"] = "Second period: Start date must be earlier than end date"
 
-    return errors if errors else None
-
+    return errors if errors else None 
     
-def get_bill_data(form_data, user):
+def bills_analysis(form_data, user):
+    def get_period_metrics(start_date, end_date):
+        query = """
+            SELECT
+                SUM(kWh_consumption) AS total_consumo_kWh,
+                SUM(net_bill) AS total_facturado,
+                ROUND(SUM(kWh_consumption * kWh_price) / NULLIF(SUM(kWh_consumption), 0), 2) AS precio_promedio_kWh
+            FROM history_consumption_bill
+            WHERE bill_date BETWEEN %s AND %s
+              AND user_id = %s;
+        """
+        return query_db(query, start_date, end_date, user)
 
-    errors= {}
-    
-    try:
-        bill_data = query_db("SELECT * FROM history_consumption_bill WHERE user_id = %s AND bill_date BETWEEN %s AND %s", user,form_data.get("date_1"),form_data.get("date_2"))
+    first_period = get_period_metrics(form_data.get("date_1"), form_data.get("date_2"))
+    second_period = get_period_metrics(form_data.get("date_3"), form_data.get("date_4"))
 
-    except Exception as e:
-        errors["database_error"] = f"An error occurred: {e}"
-    
-    if not errors:
-        return bill_data
-    else:
-        return None
+    return {
+        "first_period": first_period,
+        "second_period": second_period
+    }

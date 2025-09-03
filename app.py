@@ -419,9 +419,9 @@ def bill_analitics():
 
         if not errors:
 
-            bill_data = helpers.get_bill_data(request.form, session['user_id'])
+            bill_analysys = helpers.bills_analysis(request.form, session['user_id'])
 
-            if bill_data:
+            if bill_analysys:
                 try:
                     analized_data = analytics.bills_analysis(bill_data, session['user_id'])
 
