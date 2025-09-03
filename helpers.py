@@ -480,34 +480,43 @@ def register_bill(user, form_data):
 def validate_bill_dates(form_data, user):
     errors = {}
 
-    #Comprueba la existencia de la fecha y la validez de la fecha
-    if not form_data.get("date"):
-        errors["date"] = "Must provide date"
-    try:
-        date_object = datetime.strptime(form_data.get("date"), "%Y-%m-%d").date()
-    except ValueError:
-            errors["invalid_date"] = "Must provide valid date"
+    def parse_date(field_name):
+        value = form_data.get(field_name)
+        if not value:
+            errors[field_name] = "Must provide date"
+            return None
+        try:
+            return datetime.strptime(value, "%Y-%m-%d").date()
+        except ValueError:
+            errors[field_name] = "Must provide valid date"
+            return None
 
-    #Si existen errores los envia
+    # Parse dates
+    date_1 = parse_date("date_1")
+    date_2 = parse_date("date_2")
+    date_3 = parse_date("date_3")
+    date_4 = parse_date("date_4")  
+
     if errors:
         return errors
-    
-    
-    if not query_db("SELECT id FROM history_consumption_bill WHERE user_id = %s AND bill_date = %s", user,form_data.get("date_1")):
-        errors["date"] = "First Date do not exist"
-    
-    if not query_db("SELECT id FROM history_consumption_bill WHERE user_id = %s AND bill_date = %s", user,form_data.get("date_2")):
-        errors["date"] = "Second Date do not exist"
 
-    date_1 = date(form_data.get("date_1"))
-    date_2 = date(form_data.get("date_2"))
+    # Validar existencia en la base de datos
+    for field_name, date_value in [("date_1", date_1), ("date_2", date_2), ("date_3", date_3), ("date_4", date_4)]:
+        result = query_db(
+            "SELECT id FROM history_consumption_bill WHERE user_id = %s AND bill_date = %s",
+            user, date_value
+        )
+        if not result:
+            errors[field_name] = f"{field_name.replace('_', ' ').title()} does not exist in records"
 
-    if date_1 > date_2 :
-        errors["date"] = "The second date can not be more older than the first"
-    
-     #Si existen errores los envia
-    if errors:
-        return errors
+    # Validar orden lógico
+    if date_1 and date_2 and date_1 > date_2:
+        errors["date_1"] = "First period: Start date must be earlier than end date"
+    if date_3 and date_4 and date_3 > date_4:
+        errors["date_3"] = "Second period: Start date must be earlier than end date"
+
+    return errors if errors else None
+
     
 def get_bill_data(form_data, user):
 

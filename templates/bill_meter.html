@@ -46,12 +46,14 @@
         </tbody>
     </table>
 
-    <!-- Modal para Seleccionar Plan -->
+    <!-- Modal para Seleccionar dates -->
     <div id="bill_analysis" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h3>Select details</h3>
             <form id="bill_analitics" method="POST" action="/bill_analitics">
+                <p>Select two periods to compare your electricity consumption and billing.</p>
+                <p>First Period.</p>
                 <div class="mb-3">
                     <div class="mb-3">
                     {% if errors.date or errors.invalid_date %}
@@ -64,6 +66,21 @@
                         <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
                     {% endif %}
                     <input autocomplete="off" class="form-control mx-auto w-auto" id="date_2" name="date_2" required type="date">
+                    </div>                  
+                </div>
+                <p>Second Period.</p>
+                <div class="mb-3">
+                    <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_3" name="date_3" required type="date">
+                    </div>
+                    <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_4" name="date_4" required type="date">
                     </div>                  
                 </div>
                 <button type="submit" class="btn btn-primary">Load</button>

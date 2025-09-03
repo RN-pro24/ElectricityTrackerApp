@@ -6,5 +6,6 @@ import pandas as pd
 import seaborn as sns
 
 
-def bills_analysis():
+def bills_analysis(bill_data, user):
+    
     ...

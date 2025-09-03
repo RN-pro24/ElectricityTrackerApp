@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import helpers
+import analytics
 
 from flask import Flask, flash, redirect, render_template, request, session, jsonify
 from flask_session import Session
@@ -420,10 +421,16 @@ def bill_analitics():
 
             bill_data = helpers.get_bill_data(request.form, session['user_id'])
 
-            try:
-                ...
-            except Exception as e:
-                errors["database_error"] = f"An error occurred: {e}"
+            if bill_data:
+                try:
+                    analized_data = analytics.bills_analysis(bill_data, session['user_id'])
+
+                except Exception as e:
+                    errors["database_error"] = f"An error occurred: {e}"
+            
+            else:
+                flash("Data do not exist")
+                return redirect('/bill_analitics')
 
         return render_template('bill_meter.html', errors=errors, modal_to_open="bill_analitics")
     
