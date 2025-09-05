@@ -521,9 +521,9 @@ def bills_analysis(form_data, user):
     def get_period_metrics(start_date, end_date):
         query = """
             SELECT
-                SUM(kWh_consumption) AS total_consumo_kWh,
-                SUM(net_bill) AS total_facturado,
-                ROUND(SUM(kWh_consumption * kWh_price) / NULLIF(SUM(kWh_consumption), 0), 2) AS precio_promedio_kWh
+                SUM(kWh_consumption) AS Net_kWh_consumption,
+                SUM(net_bill) AS Sum_net_bill,
+                ROUND(SUM(kWh_consumption * kWh_price) / NULLIF(SUM(kWh_consumption), 0), 2) AS average_price_kwh
             FROM history_consumption_bill
             WHERE bill_date BETWEEN %s AND %s
               AND user_id = %s;

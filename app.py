@@ -406,7 +406,7 @@ def register_bill():
         return render_template('bill_meter.html', errors=errors, modal_to_open="registrar_bill")
     
     else:
-        return redirect('/register_bill')
+        return render_template('bill_meter.html', bills=[], errors={}, modal_to_open="registrar_bill")
 
 @app.route('/bill_analitics', methods=['GET','POST'])
 def bill_analitics():
@@ -422,15 +422,14 @@ def bill_analitics():
             bill_analysys = helpers.bills_analysis(request.form, session['user_id'])
 
             if bill_analysys:
-                try:
-                    analized_data = analytics.bills_analysis(bill_data, session['user_id'])
+                first_period_data = bill_analysys["first_period"]
+                second_period_data = bill_analysys["second_period"]
 
-                except Exception as e:
-                    errors["database_error"] = f"An error occurred: {e}"
-            
+                return render_template('bill_meter.html', bills=[], errors={}, first=first_period_data, second=second_period_data)
+
             else:
                 flash("Data do not exist")
-                return redirect('/bill_analitics')
+                return render_template('bill_meter.html', bills=[], errors={}, modal_to_open="bill_analitics")
 
         return render_template('bill_meter.html', errors=errors, modal_to_open="bill_analitics")
     
