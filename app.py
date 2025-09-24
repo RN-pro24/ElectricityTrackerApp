@@ -416,15 +416,23 @@ def bill_analitics():
     if request.method == "POST":
 
         errors = helpers.validate_bill_dates(request.form, session['user_id'])
+        print(errors)
+        print("test1")
 
         if not errors:
-
+            
+            print("test2")
             bill_analysys = helpers.bills_analysis(request.form, session['user_id'])
+            print("test3")
+            print(bill_analysys)
+
 
             if bill_analysys:
                 first_period_data = bill_analysys["first_period"]
                 second_period_data = bill_analysys["second_period"]
-
+                print("Test4")
+                print(first_period_data)
+                print(second_period_data)
                 return render_template('bill_meter.html', bills=[], errors={}, first=first_period_data, second=second_period_data)
 
             else:

@@ -10,24 +10,34 @@
 
 <p>Welcome to the bill management system. Here you can manage and view your bills.</p>
 
-    <a href="/bill_meter" class="btn btn-success">View all Bill</a>
-
-    {% if first and second %}
+{% if first and second %}
     <p>The following section presents key indicators of energy consumption and billing across the two selected periods. This comparative analysis highlights variations in net usage, total billed amounts, and the average price per kilowatt-hour, providing a data-driven foundation for evaluating cost efficiency and consumption trends.</p>
     <h2>First period</h2>
     <ul>
-        <li>Net Consumption (kWh): {{ first.Net_kWh_consumption }}</li>
-        <li>Net Bills: {{ first.Sum_net_bill }}</li>
-        <li>Average Price Promedio kWh: {{ first.average_price_kwh }}</li>
+        {% for item in first %}
+
+        <li>Net Consumption (kWh): {{ item.Net_kWh_consumption }}</li>
+        <li>Net Bills: {{ item.Sum_net_bill }}</li>
+        <li>Average Price Promedio kWh: {{ item.average_price_kwh }}</li>
+
+        {% endfor %}
+
     </ul>
 
     <h2>Second period</h2>
     <ul>
-        <li>Net Consumption (kWh): {{ second.Net_kWh_consumption }}</li>
-        <li>Net Bills: {{ second.Sum_net_bill }}</li>
-        <li>Average Price: {{ second.average_price_kwh }}</li>
+        {% for item in second %}
+
+        <li>Net Consumption (kWh): {{ item.Net_kWh_consumption }}</li>
+        <li>Net Bills: {{ item.Sum_net_bill }}</li>
+        <li>Average Price: {{ item.average_price_kwh }}</li>
+
+        {% endfor %}
     </ul>
     {% endif %}
+
+
+    <a href="/bill_meter" class="btn btn-success">View all Bill</a>
 
     <div class="button-group">
         <button id="boton_bill_analysis" class="btn btn-secondary" style="margin-right: 10px;">Bill Analysis</button>

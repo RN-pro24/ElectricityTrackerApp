@@ -496,24 +496,34 @@ def validate_bill_dates(form_data, user):
     date_2 = parse_date("date_2")
     date_3 = parse_date("date_3")
     date_4 = parse_date("date_4")  
+    print("test1.1")
 
     if errors:
         return errors
+    
+    # Validar existencia de registros en dos rangos distintos
+    rangos = [
+        ("Rango 1", date_1, date_2),
+        ("Rango 2", date_3, date_4)
+    ]
 
-    # Validar existencia en la base de datos
-    for field_name, date_value in [("date_1", date_1), ("date_2", date_2), ("date_3", date_3), ("date_4", date_4)]:
+    for nombre_rango, inicio, fin in rangos:
         result = query_db(
-            "SELECT id FROM history_consumption_bill WHERE user_id = %s AND bill_date = %s",
-            user, date_value
+            "SELECT id FROM history_consumption_bill WHERE user_id = %s AND bill_date BETWEEN %s AND %s",
+            (user, inicio, fin)
         )
         if not result:
-            errors[field_name] = f"{field_name.replace('_', ' ').title()} does not exist in records"
+            errors[nombre_rango] = f"No hay registros entre {inicio} y {fin}"
+
+    print("test1.2")
 
     # Validar orden lógico
     if date_1 and date_2 and date_1 > date_2:
         errors["date_1"] = "First period: Start date must be earlier than end date"
     if date_3 and date_4 and date_3 > date_4:
         errors["date_3"] = "Second period: Start date must be earlier than end date"
+    
+    print("test1.3")
 
     return errors if errors else None 
     
@@ -528,10 +538,11 @@ def bills_analysis(form_data, user):
             WHERE bill_date BETWEEN %s AND %s
               AND user_id = %s;
         """
-        return query_db(query, start_date, end_date, user)
+        return query_db(query, (start_date, end_date, user))
 
     first_period = get_period_metrics(form_data.get("date_1"), form_data.get("date_2"))
     second_period = get_period_metrics(form_data.get("date_3"), form_data.get("date_4"))
+    print("test2.1")
 
     return {
         "first_period": first_period,
