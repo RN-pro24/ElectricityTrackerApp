@@ -42,10 +42,13 @@ nav .navbar-brand .green
 h1{
     font-family: 'Montserrat', sans-serif; /* Fuente de Google Fonts */
     font-size: 3rem;
-    font-weight: bold;
-    color: #333;
+    font-weight: 700;
+    color: #2c3e50;
     text-align: center;
-    margin-bottom: 60px; /* Ajusta el valor según el espacio deseado */
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+
 
 
 
@@ -53,8 +56,24 @@ h1{
 
 h2{
     font-family: 'Roboto', sans-serif;
-    font-size: 2rem;
-    font-weight: 300;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: #34495e;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 180px;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #eee;
+    display: inline-block;
+    padding-bottom: 8px;
+
+
+}
+
+h3{
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 25px;
+    line-height: 1.5;
 
 }
 
@@ -104,4 +123,105 @@ p{
     cursor: pointer;
 }
 
+.button-group {
+    display: flex;
+    justify-content: center; /* 🔥 Esto centra los botones */
+    gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
 
+    .btn-separator {
+    display: block;           /* 🔄 Ocupa toda la línea */
+    margin-top: 30px;         /* 🔼 Espacio entre h2 y botón */
+    margin-bottom: 15px;
+    text-align: center;       /* ✅ Centrado sin ocupar toda la línea */
+    width: fit-content;       /* ✅ Solo ocupa lo necesario */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+    .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.col {
+    flex: 1 1 300px;
+    max-width: 400px;
+}
+
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 16px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.card p {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    color: #555;
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.card-section {
+    margin-bottom: 60px;
+}
+
+.flash-message {
+    padding: 12px 20px;
+    margin-bottom: 40px;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.flash-message.info {
+    background-color: #e8f4fd;
+    color: #31708f;
+    border: 1px solid #bce8f1;
+}
+
+.flash-message.success {
+    background-color: #e6f9e8;
+    color: #3c763d;
+    border: 1px solid #d6e9c6;
+}
+
+.flash-message.warning {
+    background-color: #fff8e5;
+    color: #8a6d3b;
+    border: 1px solid #faebcc;
+}
+
+.flash-message.error {
+    background-color: #fbeaea;
+    color: #a94442;
+    border: 1px solid #ebccd1;
+}

@@ -47,6 +47,7 @@ def after_request(response):
 #Home page
 @app.route("/", methods=["GET", "POST"])
 def home():
+    flash("Welcome to Electricity Tracker App.", "info")
     return render_template('index.html')
 
 
@@ -139,6 +140,8 @@ def logout():
 
 @app.route('/plans', methods=['GET'])
 def view_all_plans():
+
+    flash("Welcome to the energy cost management system. Here you can manage and view your plans.", "info")
 
     plans = helpers.query_db("SELECT * FROM energetic_cost WHERE user_id = %s", (session["user_id"],))
 
@@ -254,6 +257,8 @@ def register_plan():
 
 @app.route('/gadgets', methods=['GET'])
 def view_all_gadgets():
+
+    flash("Welcome to the Gadgets management system. Here you can manage and view your gadgets.", "info")
 
     gadgets = helpers.query_db("SELECT * FROM gadgets WHERE user_id = %s", (session["user_id"],))
 
@@ -371,6 +376,7 @@ def register_gadget():
 
 @app.route('/bill_meter', methods=['GET'])
 def bill_meters():
+    flash("Welcome to the bill management system. Here you can manage and view your bills.", "info")
 
     bills = helpers.query_db("SELECT * FROM history_consumption_bill WHERE user_id = %s", (session["user_id"],))
 
@@ -416,23 +422,14 @@ def bill_analitics():
     if request.method == "POST":
 
         errors = helpers.validate_bill_dates(request.form, session['user_id'])
-        print(errors)
-        print("test1")
 
         if not errors:
             
-            print("test2")
             bill_analysys = helpers.bills_analysis(request.form, session['user_id'])
-            print("test3")
-            print(bill_analysys)
-
 
             if bill_analysys:
                 first_period_data = bill_analysys["first_period"]
                 second_period_data = bill_analysys["second_period"]
-                print("Test4")
-                print(first_period_data)
-                print(second_period_data)
                 return render_template('bill_meter.html', bills=[], errors={}, first=first_period_data, second=second_period_data)
 
             else:

@@ -496,7 +496,7 @@ def validate_bill_dates(form_data, user):
     date_2 = parse_date("date_2")
     date_3 = parse_date("date_3")
     date_4 = parse_date("date_4")  
-    print("test1.1")
+    
 
     if errors:
         return errors
@@ -515,7 +515,7 @@ def validate_bill_dates(form_data, user):
         if not result:
             errors[nombre_rango] = f"No hay registros entre {inicio} y {fin}"
 
-    print("test1.2")
+    
 
     # Validar orden lógico
     if date_1 and date_2 and date_1 > date_2:
@@ -523,7 +523,7 @@ def validate_bill_dates(form_data, user):
     if date_3 and date_4 and date_3 > date_4:
         errors["date_3"] = "Second period: Start date must be earlier than end date"
     
-    print("test1.3")
+    
 
     return errors if errors else None 
     
@@ -542,7 +542,7 @@ def bills_analysis(form_data, user):
 
     first_period = get_period_metrics(form_data.get("date_1"), form_data.get("date_2"))
     second_period = get_period_metrics(form_data.get("date_3"), form_data.get("date_4"))
-    print("test2.1")
+    
 
     return {
         "first_period": first_period,
