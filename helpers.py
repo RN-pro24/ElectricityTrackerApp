@@ -548,3 +548,82 @@ def bills_analysis(form_data, user):
         "first_period": first_period,
         "second_period": second_period
     }
+
+def validate_electric_meter_register(form_data, user):
+    errors = {}
+
+    def parse_date(field_name):
+        value = form_data.get(field_name)
+        if not value:
+            errors[field_name] = "Must provide date"
+            return None
+        try:
+            return datetime.strptime(value, "%Y-%m-%d").date()
+        except ValueError:
+            errors[field_name] = "Must provide valid date"
+            return None
+    
+    date_1 = parse_date("date_start")
+    date_2 = parse_date("date_end")  
+    
+
+    if errors:
+        return errors
+    
+
+    #Comprueba description
+    if not form_data.get("month"):
+        errors["month"] = "Must provide description"
+
+    #Comprueba em_start
+    if not form_data.get("em_start"):
+        errors["em_start"] = "Must provide kWh Start"
+    try:
+        amount = float(form_data.get("em_start"))
+    except ValueError:
+        errors["em_start"] = "Kwh is not a number"
+  
+    #Comprueba em_start
+    if not form_data.get("em_end"):
+        errors["em_end"] = "Must provide kWh End"
+    #Comprueba que kWh sea numero
+    try:
+        amount = float(form_data.get("em_end"))
+    except ValueError:
+        errors["em_end"] = "kWh End is not a number"
+
+        
+    #Si existen errores los envia
+    if errors:
+        return errors
+
+
+def register_electric_meters(user, form_data):
+    errors = {}
+
+    kWh_consumption = form_data.get("em_end") - form_data.get("em_start")
+
+    query = """
+    INSERT INTO history_consumption_electric_meter
+    (
+        user_id,
+        date_start,
+        date_end,
+        month,
+        em_start,
+        em_end,
+        kWh_consumption
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s);
+    """
+    
+    values = (user, form_data.get("date_start"),form_data.get("date_end"),form_data.get("month"), form_data.get("em_start"),
+              form_data.get("em_end"), kWh_consumption)
+
+    try:
+        insert_db(query,values)
+
+    except Exception as e:
+        errors["database_error"] = f"An error occurred: {e}"
+    
+    return errors if errors else True

@@ -440,3 +440,71 @@ def bill_analitics():
     
     else:
         return redirect('/bill_analitics')
+    
+@app.route('/electric_meter', methods=['GET'])
+def electric_meters():
+    flash("Welcome to the electric consumption management system. Here you can manage and view your electric consumption.", "info")
+
+    electric_consumptions = helpers.query_db("SELECT * FROM history_consumption_electric_meter WHERE user_id = %s", (session["user_id"],))
+
+    #Si existen las facturas las envia
+    if electric_consumptions:
+        return render_template('electric_meter.html', electric_consumptions=electric_consumptions, errors={})
+    
+    #Si no existen lo envia al modal de registro
+    else:
+        flash("You don't have electric consumption, please register one")
+        return render_template('electric_meter.html', electric_consumptions=[], modal_to_open="registrar_electric_consumption", errors={})
+    
+
+@app.route('/register_electric_consumption', methods=['GET','POST'])
+def register_electric_consumption():
+
+    errors= {}
+
+    if request.method == "POST":
+        errors = helpers.validate_electric_meter_register(request.form, session['user_id'])
+
+        if not errors:
+            try:
+                if helpers.register_electric_meters(session['user_id'], request.form):
+                    flash("Register Complete")
+                    return redirect('/electric_meter')
+                else:
+                     errors["registration_failed"] = "Unable to complete registration."
+                     return render_template('electric_meter.html', errors=errors, modal_to_open="registrar_electric_consumption")
+                
+            except Exception as e:
+                errors["database_error"] = f"An error occurred: {e}"
+
+        return render_template('electric_meter.html', errors=errors, modal_to_open="registrar_electric_consumption")
+    
+    else:
+        return render_template('electric_meter.html', electric_consumptions=[], errors={}, modal_to_open="registrar_electric_consumption")
+    
+@app.route('/electric_consumption_analitics', methods=['GET','POST'])
+def electric_consumption_analitics():
+    
+    errors= {}
+
+    if request.method == "POST":
+
+        errors = helpers.validate_bill_dates(request.form, session['user_id'])
+
+        if not errors:
+            
+            bill_analysys = helpers.bills_analysis(request.form, session['user_id'])
+
+            if bill_analysys:
+                first_period_data = bill_analysys["first_period"]
+                second_period_data = bill_analysys["second_period"]
+                return render_template('bill_meter.html', electric_consumptions=[], errors={}, first=first_period_data, second=second_period_data)
+
+            else:
+                flash("Data do not exist")
+                return render_template('electric_meter.html', electric_consumptions=[], errors={}, modal_to_open="electric_consumption_analitics")
+
+        return render_template('electric_meter.html', errors=errors, modal_to_open="electric_consumption_analitics")
+    
+    else:
+        return redirect('/electric_meter')

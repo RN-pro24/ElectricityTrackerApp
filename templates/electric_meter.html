@@ -1,136 +1,223 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    income
+    electric_meter
 {% endblock %}
 
 {% block main %}
 
-<h1>Income</h1>
-    <form action="/income" method="post">
-        <div class="mb-3">
-            {% if errors.date or errors.invalid_date %}
-            <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" name="date" required type="date" >
+<h1>Electric Meters</h1>
+
+{% if first and second %}
+<h3>Comparative overview of energy consumption and billing:</h3>
+
+<div class="card-section">
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <h3>First Period</h3>
+            {% for item in first %}
+            <p><strong>Net Consumption:</strong> {{ item.Net_kWh_consumption }} kWh</p>
+            <p><strong>Net Bills:</strong> ${{ item.Sum_net_bill }}</p>
+            <p><strong>Avg. Price/kWh:</strong> ${{ item.average_price_kwh }}</p>
+            {% endfor %}
         </div>
-
-        <div class="mb-3">
-            {% if errors.amount or errors.is_not_number %}
-            <p style="color: red;">{{errors.amount if errors.amount else errors.is_not_number}}</p>
-            {% endif %}
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="amount" required placeholder="amount" type="number" min="0" step="0.01"  >
+    </div>
+    <div class="col">
+        <div class="card">
+            <h3>Second Period</h3>
+            {% for item in second %}
+            <p><strong>Net Consumption:</strong> {{ item.Net_kWh_consumption }} kWh</p>
+            <p><strong>Net Bills:</strong> ${{ item.Sum_net_bill }}</p>
+            <p><strong>Avg. Price/kWh:</strong> ${{ item.average_price_kwh }}</p>
+            {% endfor %}
         </div>
-
-        <div class="mb-3">
-            {% if errors.asset_accounts %}
-            <p style="color: red;">{{errors.asset_accounts}}</p>
-            {% endif %}
-            <select class="form-select mx-auto w-auto" id="asset_accounts" name="asset_accounts" onchange="toggleNameField();">
-                <option disabled selected>Assets</option>
-                {% for assest in assets %}
-                {% if assest['asset_accounts'] != "Payable" %}
-
-                    <option value="{{ assest['asset_accounts'] }}">{{ assest['asset_accounts'] }}</option>
+    </div>
+</div>
+</div>
+{% endif %}
 
 
+
+    <a href="/electric_meter" class="btn btn-success btn-separator">View all Bill</a>
+
+    <div class="button-group">
+        <button id="boton_electric_analysis" class="btn btn-secondary" style="margin-right: 10px;">Electric consumption Analysis</button>
+        <button id="boton_register_electric_consumption" class="btn btn-primary">Register electric consumption</button>
+    </div>
+
+
+    <!-- Tabla para mostrar los planes actuales -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date start</th>
+                <th>Date end</th>
+                <th>Description</th>
+                <th>Kwh start</th>
+                <th>Kwh end</th>
+                <th>Net Kwh consumption</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for electric_c in electric_consumptions %}
+            <tr>
+                <td>{{ electric_c.date_start }}</td>
+                <td>{{ electric_c.date_end }}</td>
+                <td>{{ electric_c.month }}</td>
+                <td>{{ electric_c.em_start }}</td>
+                <td>{{ electric_c.em_end }}</td>
+                <td>{{ electric_c.kWh_consumption }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal para Seleccionar dates -->
+    <div id="electric_consumption_analysis" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Select details</h3>
+            <form id="electric_consumption_analitics" method="POST" action="/electric_consumption_analitics">
+                <p>Select two periods to compare your electricity consumption and billing.</p>
+                <p>First Period.</p>
+                <div class="mb-3">
+                    <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
                     {% endif %}
-                {% endfor %}
-
-            </select>
-        </div>
-
-        <div class="mb-3">
-            {% if errors.others_asset_accounts %}
-            <p style="color: red;">{{errors.others_asset_accounts}}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" id="others_asset_accounts" name="others_asset_accounts" required placeholder="others asset accounts" type="text" disabled oninput="capitalizeFirstLetter(this)" maxlength="14">
-        </div>
-
-        <div class="mb-3">
-            {% if errors.income_source_category %}
-            <p style="color: red;">{{errors.income_source_category}}</p>
-            {% endif %}
-            <select class="form-select mx-auto w-auto" id="income_source_category" name="income_source_category" onchange="toggleNameField2()">
-                <option disabled selected>Income source category</option>
-                {% for category in categorys %}
-                    {% if category['income_source_category'] != "N/A" %}
-
-                    <option value="{{ category['income_source_category'] }}">{{ category['income_source_category'] }}</option>
-
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_1" name="date_1" required type="date">
+                    </div>
+                    <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
                     {% endif %}
-                {% endfor %}
-
-            </select>
-        </div>
-
-        <div class="mb-3">
-            {% if errors.others_income_source_category %}
-            <p style="color: red;">{{errors.others_income_source_category}}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" id="others_income_source_category" name="others_income_source_category" required placeholder="others income source category" type="text" disabled oninput="capitalizeFirstLetter(this)" maxlength="14">
-        </div>
-
-        <div class="mb-3">
-            {% if errors.receivable %}
-            <p style="color: red;">{{errors.receivable}}</p>
-            {% endif %}
-            <select class="form-select mx-auto w-auto" id="receivable" name="receivable" onchange="toggleNameField3()" disabled>
-                <option disabled selected>Receivable</option>
-                {% for receivable in receivables %}
-                    {% if receivable['receivable'] != "N/A" %}
-
-                    <option value="{{ receivable['receivable'] }}">{{ receivable['receivable'] }}</option>
-
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_2" name="date_2" required type="date">
+                    </div>                  
+                </div>
+                <p>Second Period.</p>
+                <div class="mb-3">
+                    <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
                     {% endif %}
-                {% endfor %}
-
-            </select>
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_3" name="date_3" required type="date">
+                    </div>
+                    <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_4" name="date_4" required type="date">
+                    </div>                  
+                </div>
+                <button type="submit" class="btn btn-primary">Load</button>
+            </form>
         </div>
+    </div>
 
-        <div class="mb-3">
-            {% if errors.others_receivable %}
-            <p style="color: red;">{{errors.others_receivable}}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" id="others_receivable" name="others_receivable" required placeholder="others receivable" type="text" disabled oninput="capitalizeFirstLetter(this)" maxlength="14">
+
+    <!-- Modal para Registrar Nuevo Plan -->
+    <div id="registrar_electric_consumption" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Register Electric Consumption</h3>
+            <form id="register_electric_consumption" action="/register_electric_consumption" method="post">
+                <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_start" name="date_start" required type="date">
+                </div>
+                <div class="mb-3">
+                    {% if errors.date or errors.invalid_date %}
+                        <p style="color: red;">{{ errors.date if errors.date else errors.invalid_date }}</p>
+                    {% endif %}
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="date_end" name="date_end" required type="date">
+                </div>
+                <div class="mb-3">
+                    {% if errors.bill_month or errors.bill_month_not_exist %}
+                        <p style="color: red;">{{errors.bill_month if errors.bill_month else errors.bill_month_not_exist}}</p>
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="month" name="month" required placeholder="Description" type="text" oninput="capitalizeFirstLetter(this)" maxlength="20">
+                </div>
+                <div class="mb-3">
+                    {% if errors.em_start or errors.em_start_not_exist %}
+                        <p style="color: red;">{{errors.em_start if errors.em_start else errors.em_start_not_exist}}</p>
+                    {% endif %}
+                    <input id="em_start" autocomplete="off" name="em_start" autofocus required type="number" maxlength="50" placeholder="kWh Start" class="form-control mx-auto w-auto" min="0" step="0.01">
+                </div>
+                <div class="mb-3">
+                    {% if errors.em_end or errors.em_end_not_exist %}
+                        <p style="color: red;">{{errors.em_end if errors.em_end else errors.em_end_not_exist}}</p>
+                    {% endif %}
+                    <input id="em_end" autocomplete="off" name="em_end" autofocus required type="number" maxlength="50" placeholder="kWh End" class="form-control mx-auto w-auto" min="0" step="0.01">
+                </div>
+                <div class="mb-3">
+                    {% if errors.kWh_consumption or errors.kWh_consumption_not_valid %}
+                        <p style="color: red;">{{errors.kWh_consumption if errors.kWh_consumption else errors.kWh_consumption_not_exist}}</p>
+                    {% endif %}
+                    <input id="kWh_consumption" name="kWh_consumption" placeholder="kWh consumption" required type="number" autofocus autocomplete="off" maxlength="50" class="form-control mx-auto w-auto" min="0" step="0.01">
+                </div>
+                <button class="btn btn-primary" type="submit">Register</button>
+            </form>
         </div>
+    </div>
 
-        <div class="mb-3">
-            {% if errors.description %}
-            <p style="color: red;">{{errors.description}}</p>
-            {% endif %}
-            <input autocomplete="off" class="form-control mx-auto w-auto" name="description" required placeholder="description" type="text" >
-        </div>
-
-        <button class="btn btn-primary" type="submit">Register</button>
-    </form>
+    <script src="scripts.js"></script>
 
     <script>
-        function toggleNameField() {
-            const asset_accounts = document.getElementById("asset_accounts").value;
-            const others_asset_accounts = document.getElementById("others_asset_accounts");
-            const receivable = document.getElementById("receivable");
-            others_asset_accounts.disabled = asset_accounts !== "Others";
-            receivable.disabled = asset_accounts !== "Receivable";
-          }
 
-        function toggleNameField2() {
-            const income_source_category = document.getElementById("income_source_category").value;
-            const others_income_source_category = document.getElementById("others_income_source_category");
-            others_income_source_category.disabled = income_source_category !== "Others";
-          }
+        document.addEventListener("DOMContentLoaded", () => {
+    const modalToOpen = "{{ modal_to_open }}";
 
-        function toggleNameField3() {
-            const receivable = document.getElementById("receivable").value;
-            const others_receivable = document.getElementById("others_receivable");
-            others_receivable.disabled = receivable !== "Others";
-          }
+    const modals = {
+        edit: document.getElementById("electric_consumption_analysis"),
+        register: document.getElementById("registrar_electric_consumption")
+    };
 
-        function capitalizeFirstLetter(input) {
-            let value = input.value;
-            input.value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    if (modals[modalToOpen]) {
+        modals[modalToOpen].style.display = "block";
+    }
+
+    
+    const electric_consumption_analysis = document.getElementById("electric_consumption_analysis");
+    const registrar_electric_consumption = document.getElementById("registrar_electric_consumption");
+
+    const btnModificar = document.getElementById("boton_electric_analysis");
+    const btnRegistrar = document.getElementById("boton_register_electric_consumption");
+
+    btnModificar.addEventListener("click", () => electric_consumption_analysis.style.display = "block");
+    btnRegistrar.addEventListener("click", () => registrar_electric_consumption.style.display = "block");
+
+    document.querySelectorAll(".close").forEach(closeBtn => {
+        closeBtn.addEventListener("click", () => {
+            const modal = closeBtn.closest(".modal");
+            if (modal) modal.style.display = "none";
+        });
+    });
+
+    window.addEventListener("click", event => {
+        if (event.target === electric_consumption_analysis) electric_consumption_analysis.style.display = "none";
+        if (event.target === registrar_electric_consumption) registrar_electric_consumption.style.display = "none";
+    });
+});
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var modalToOpen = "{{ modal_to_open }}";
+        if (modalToOpen === "electric_consumption_analysis") {
+            document.getElementById("electric_consumption_analysis").style.display = "block";
+        }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (modalToOpen === "edit") {
+                document.getElementById("electric_consumption_analysis").style.display = "block";
+            } else if (modalToOpen === "register") {
+                document.getElementById("registrar_electric_consumption").style.display = "block";
             }
+         });
 
-    </script>
+</script>
+
 
 {% endblock %}
