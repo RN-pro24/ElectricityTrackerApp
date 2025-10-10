@@ -17,9 +17,9 @@
         <div class="card">
             <h3>First Period</h3>
             {% for item in first %}
-            <p><strong>Net Consumption:</strong> {{ item.Net_kWh_consumption }} kWh</p>
-            <p><strong>Net Bills:</strong> ${{ item.Sum_net_bill }}</p>
-            <p><strong>Avg. Price/kWh:</strong> ${{ item.average_price_kwh }}</p>
+            <p><strong>Net Consumption:</strong> {{ item.Net_Consumption }} kWh</p>
+            <p><strong>Net Days:</strong> ${{ item.Net_Days }}</p>
+            <p><strong>Avg. Consumption/kWh:</strong> ${{ item.Average_Consumption }}</p>
             {% endfor %}
         </div>
     </div>
@@ -27,9 +27,9 @@
         <div class="card">
             <h3>Second Period</h3>
             {% for item in second %}
-            <p><strong>Net Consumption:</strong> {{ item.Net_kWh_consumption }} kWh</p>
-            <p><strong>Net Bills:</strong> ${{ item.Sum_net_bill }}</p>
-            <p><strong>Avg. Price/kWh:</strong> ${{ item.average_price_kwh }}</p>
+            <p><strong>Net Consumption:</strong> {{ item.Net_Consumption }} kWh</p>
+            <p><strong>Net Days:</strong> ${{ item.Net_Days }}</p>
+            <p><strong>Avg. Consumption/kWh:</strong> ${{ item.Average_Consumption }}</p>
             {% endfor %}
         </div>
     </div>

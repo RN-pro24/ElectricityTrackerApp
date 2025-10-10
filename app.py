@@ -482,6 +482,7 @@ def register_electric_consumption():
     else:
         return render_template('electric_meter.html', electric_consumptions=[], errors={}, modal_to_open="registrar_electric_consumption")
     
+    
 @app.route('/electric_consumption_analitics', methods=['GET','POST'])
 def electric_consumption_analitics():
     
@@ -489,16 +490,16 @@ def electric_consumption_analitics():
 
     if request.method == "POST":
 
-        errors = helpers.validate_bill_dates(request.form, session['user_id'])
+        errors = helpers.validate_electric_meters_dates(request.form, session['user_id'])
 
         if not errors:
             
-            bill_analysys = helpers.bills_analysis(request.form, session['user_id'])
+            electric_meters_analysys = helpers.electric_meters_analysis(request.form, session['user_id'])
 
-            if bill_analysys:
-                first_period_data = bill_analysys["first_period"]
-                second_period_data = bill_analysys["second_period"]
-                return render_template('bill_meter.html', electric_consumptions=[], errors={}, first=first_period_data, second=second_period_data)
+            if electric_meters_analysys:
+                first_period_data = electric_meters_analysys["first_period"]
+                second_period_data = electric_meters_analysys["second_period"]
+                return render_template('electric_meter.html', electric_consumptions=[], errors={}, first=first_period_data, second=second_period_data)
 
             else:
                 flash("Data do not exist")

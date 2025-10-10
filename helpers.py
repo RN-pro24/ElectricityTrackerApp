@@ -2,15 +2,27 @@ import mysql.connector
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from datetime import date
+from dotenv import load_dotenv
+import os
 
+
+# Cargar variables del archivo .env
+load_dotenv()
+
+# Acceder a las variables
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT")
+db_name = os.getenv("DB_NAME")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
 
 #Conect with mySQL database
 def connect_db():
     return mysql.connector.connect(
-        host="localhost",
-        user="admin_user",
-        password="Isa240122-*",
-        database="electricity_tracker_app"
+        host=db_host,
+        user=db_user,
+        password=db_password,
+        database=db_name
     )
 
 #make query in database
@@ -627,3 +639,89 @@ def register_electric_meters(user, form_data):
         errors["database_error"] = f"An error occurred: {e}"
     
     return errors if errors else True
+
+
+def validate_electric_meters_dates(form_data, user):
+    errors = {}
+
+    def parse_date(field_name):
+        value = form_data.get(field_name)
+        if not value:
+            errors[field_name] = "Must provide date"
+            return None
+        try:
+            return datetime.strptime(value, "%Y-%m-%d").date()
+        except ValueError:
+            errors[field_name] = "Must provide valid date"
+            return None
+
+    # Parse dates
+    date_1 = parse_date("date_1")
+    date_2 = parse_date("date_2")
+    date_3 = parse_date("date_3")
+    date_4 = parse_date("date_4")  
+    
+
+    if errors:
+        return errors
+    
+    # Validar existencia de registros en dos rangos distintos
+    rangos = [
+        ("Rango 1", date_1, date_2),
+        ("Rango 2", date_3, date_4)
+    ]
+
+    for nombre_rango, inicio, fin in rangos:
+        result = query_db(
+            "SELECT id FROM history_consumption_electric_meter WHERE user_id = %s AND date_start BETWEEN %s AND %s AND date_end BETWEEN %s AND %s",
+            (user, inicio, fin, inicio, fin)
+        )
+        if not result:
+            errors[nombre_rango] = f"No hay registros entre {inicio} y {fin}"
+
+    
+
+    # Validar orden lógico
+    if date_1 and date_2 and date_1 > date_2:
+        errors["date_1"] = "First period: Start date must be earlier than end date"
+    if date_3 and date_4 and date_3 > date_4:
+        errors["date_3"] = "Second period: Start date must be earlier than end date"
+    
+    
+
+    return errors if errors else None 
+    
+def electric_meters_analysis(form_data, user):
+    def get_period_metrics(start_date, end_date):
+        query = """
+            SELECT
+                SUM(em_start) AS Net_kWh_initials,
+                SUM(em_end) AS Net_kWh_finals,
+                SUM(DATEDIFF(DAY, date_start, date_end)) AS Net_Days,
+                SUM(em_end) - SUM(em_start) AS Net_Consumption
+            FROM history_consumption_electric_meter
+            WHERE date_end >= %(start_date)s AND date_start <= %(end_date)s
+              AND user_id = %(user_id)s;
+        """
+        params = {
+            "start_date": start_date,
+            "end_date": end_date,
+            "user_id": user
+        }
+        result = query_db(query, params)
+
+        if result and result[0]["Net_Days"] > 0:
+            result[0]["Average_Consumption"] = round(result[0]["Net_Consumption"] / result[0]["Net_Days"], 2)
+        else:
+            result[0]["Average_Consumption"] = 0
+
+        return result[0]
+
+    first_period = get_period_metrics(form_data.get("date_1"), form_data.get("date_2"))
+    second_period = get_period_metrics(form_data.get("date_3"), form_data.get("date_4"))
+    
+
+    return {
+        "first_period": first_period,
+        "second_period": second_period
+    }
