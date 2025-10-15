@@ -613,7 +613,7 @@ def validate_electric_meter_register(form_data, user):
 def register_electric_meters(user, form_data):
     errors = {}
 
-    kWh_consumption = form_data.get("em_end") - form_data.get("em_start")
+    kWh_consumption = int(form_data.get("em_end")) - int(form_data.get("em_start"))
 
     query = """
     INSERT INTO history_consumption_electric_meter
@@ -697,7 +697,7 @@ def electric_meters_analysis(form_data, user):
             SELECT
                 SUM(em_start) AS Net_kWh_initials,
                 SUM(em_end) AS Net_kWh_finals,
-                SUM(DATEDIFF(DAY, date_start, date_end)) AS Net_Days,
+                SUM(DATEDIFF(date_end, date_start)) AS Net_Days,
                 SUM(em_end) - SUM(em_start) AS Net_Consumption
             FROM history_consumption_electric_meter
             WHERE date_end >= %(start_date)s AND date_start <= %(end_date)s

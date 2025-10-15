@@ -16,21 +16,18 @@
     <div class="col">
         <div class="card">
             <h3>First Period</h3>
-            {% for item in first %}
-            <p><strong>Net Consumption:</strong> {{ item.Net_Consumption }} kWh</p>
-            <p><strong>Net Days:</strong> ${{ item.Net_Days }}</p>
-            <p><strong>Avg. Consumption/kWh:</strong> ${{ item.Average_Consumption }}</p>
-            {% endfor %}
+            <p><strong>Net Consumption:</strong> {{ first.Net_Consumption }} kWh</p>
+            <p><strong>Net Days:</strong> {{ first.Net_Days }}</p>
+            <p><strong>Avg. Consumption kWh by day:</strong> ${{ first.Average_Consumption }}</p>
+            
         </div>
     </div>
     <div class="col">
         <div class="card">
             <h3>Second Period</h3>
-            {% for item in second %}
-            <p><strong>Net Consumption:</strong> {{ item.Net_Consumption }} kWh</p>
-            <p><strong>Net Days:</strong> ${{ item.Net_Days }}</p>
-            <p><strong>Avg. Consumption/kWh:</strong> ${{ item.Average_Consumption }}</p>
-            {% endfor %}
+            <p><strong>Net Consumption:</strong> {{ second.Net_Consumption }} kWh</p>
+            <p><strong>Net Days:</strong> {{ second.Net_Days }}</p>
+            <p><strong>Avg. Consumption kWh by day:</strong> ${{ second.Average_Consumption }}</p>
         </div>
     </div>
 </div>
@@ -151,12 +148,6 @@
                         <p style="color: red;">{{errors.em_end if errors.em_end else errors.em_end_not_exist}}</p>
                     {% endif %}
                     <input id="em_end" autocomplete="off" name="em_end" autofocus required type="number" maxlength="50" placeholder="kWh End" class="form-control mx-auto w-auto" min="0" step="0.01">
-                </div>
-                <div class="mb-3">
-                    {% if errors.kWh_consumption or errors.kWh_consumption_not_valid %}
-                        <p style="color: red;">{{errors.kWh_consumption if errors.kWh_consumption else errors.kWh_consumption_not_exist}}</p>
-                    {% endif %}
-                    <input id="kWh_consumption" name="kWh_consumption" placeholder="kWh consumption" required type="number" autofocus autocomplete="off" maxlength="50" class="form-control mx-auto w-auto" min="0" step="0.01">
                 </div>
                 <button class="btn btn-primary" type="submit">Register</button>
             </form>
