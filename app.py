@@ -134,11 +134,58 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
+@app.route("/password_change", methods=["GET", "POST"])
+@helpers.login_required
+def password_change():
+    """Change password"""
+
+    errors = {}
+
+    if request.method == "POST":
+        if not request.form.get("password"):
+            errors["invalid_date"] = "Must provide password"
+
+        if not request.form.get("new_password"):
+            errors["invalid_date"] = "Must provide password"
+
+        if not request.form.get("confirmation"):
+            errors["invalid_date"] = "Must provide password"
+
+        # Query database for username
+        query = "SELECT * FROM users WHERE id = %s"
+
+        rows = helpers.query_db(query, (session["user_id"],)
+        )
+
+        # Ensure username exists and password is correct
+        if len(rows) != 1 or not check_password_hash(
+            rows[0]["password"], request.form.get("password")
+        ):
+            errors["invalid_date"] = "Must provide password"
+
+        confirm_password = request.form.get("confirmation")
+        new_password = request.form.get("new_password")
+
+        if confirm_password != new_password:
+            errors["invalid_date"] = "Must provide password"
+
+        if errors:
+            return render_template("password_change.html", errors=errors)
+
+        new_password_act = generate_password_hash(new_password)
+        helpers.insert_db("UPDATE users SET password = %s WHERE id = %s", (new_password_act, session["user_id"]))
+
+        return redirect("/")
+
+    else:
+        return render_template("password_change.html")
+
 
 """Creacion y desarrollo de planes"""
 
 
 @app.route('/plans', methods=['GET'])
+@helpers.login_required
 def view_all_plans():
 
     flash("Welcome to the energy cost management system. Here you can manage and view your plans.", "info")
@@ -156,6 +203,7 @@ def view_all_plans():
 
 
 @app.route('/select_plan', methods=['GET','POST'])
+@helpers.login_required
 def select_plan():
 
     plans = helpers.query_db("SELECT * FROM energetic_cost WHERE user_id = %s", (session["user_id"],))
@@ -189,6 +237,7 @@ def select_plan():
             return render_template('energy_cost.html', plans=[], errors={} ,modal_to_open="modalRegistrar", plan=None)
         
 @app.route('/edit_plan', methods=['GET','POST'])
+@helpers.login_required
 def edit_plan():
     #Declarar variable para uso de ambos metodos
     fee_id = None
@@ -228,6 +277,7 @@ def edit_plan():
         fee_id = helpers.query_db("SELECT id FROM energetic_cost WHERE fee_name = %s", (fee_name,))
 
 @app.route('/register_plan' , methods=['GET','POST'])
+@helpers.login_required
 def register_plan():
 
     errors = {}
@@ -256,6 +306,7 @@ def register_plan():
 """Creacion y desarrollo de gadgets"""
 
 @app.route('/gadgets', methods=['GET'])
+@helpers.login_required
 def view_all_gadgets():
 
     flash("Welcome to the Gadgets management system. Here you can manage and view your gadgets.", "info")
@@ -274,6 +325,7 @@ def view_all_gadgets():
         return render_template('gadgets.html', gadgets=[], modal_to_open="registrar_gadget", errors={}, gadget=None, plans=plans)
 
 @app.route('/select_gadget', methods=['GET','POST'])
+@helpers.login_required
 def select_gadget():
 
     gadgets = helpers.query_db("SELECT * FROM gadgets WHERE user_id = %s", (session["user_id"],))
@@ -308,6 +360,7 @@ def select_gadget():
             return render_template('gadgets.html', gadgets=[], errors={} ,modal_to_open="registrar_gadget", plan=None)
         
 @app.route('/edit_gadget', methods=['GET','POST'])
+@helpers.login_required
 def edit_gadget():
     #Declarar variable para uso de ambos metodos
     gadget_id = None
@@ -347,6 +400,7 @@ def edit_gadget():
 
 
 @app.route('/register_gadget' , methods=['GET','POST'])
+@helpers.login_required
 def register_gadget():
 
     errors = {}
@@ -375,6 +429,7 @@ def register_gadget():
 """Creacion y desarrollo de bills"""
 
 @app.route('/bill_meter', methods=['GET'])
+@helpers.login_required
 def bill_meters():
     flash("Welcome to the bill management system. Here you can manage and view your bills.", "info")
 
@@ -390,6 +445,7 @@ def bill_meters():
         return render_template('bill_meter.html', bills=[], modal_to_open="registrar_bill", errors={})
 
 @app.route('/register_bill', methods=['GET','POST'])
+@helpers.login_required
 def register_bill():
 
     errors= {}
@@ -415,6 +471,7 @@ def register_bill():
         return render_template('bill_meter.html', bills=[], errors={}, modal_to_open="registrar_bill")
 
 @app.route('/bill_analitics', methods=['GET','POST'])
+@helpers.login_required
 def bill_analitics():
     
     errors= {}
@@ -442,6 +499,7 @@ def bill_analitics():
         return redirect('/bill_analitics')
     
 @app.route('/electric_meter', methods=['GET'])
+@helpers.login_required
 def electric_meters():
     flash("Welcome to the electric consumption management system. Here you can manage and view your electric consumption.", "info")
 
@@ -458,6 +516,7 @@ def electric_meters():
     
 
 @app.route('/register_electric_consumption', methods=['GET','POST'])
+@helpers.login_required
 def register_electric_consumption():
 
     errors= {}
@@ -484,6 +543,7 @@ def register_electric_consumption():
     
     
 @app.route('/electric_consumption_analitics', methods=['GET','POST'])
+@helpers.login_required
 def electric_consumption_analitics():
     
     errors= {}
