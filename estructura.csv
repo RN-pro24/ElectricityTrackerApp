@@ -1,0 +1,66 @@
+TABLE_NAME	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_KEY	EXTRA	COLUMN_DEFAULT
+energetic_cost	id	int	NO	PRI	auto_increment	NULL
+energetic_cost	user_id	int	NO	MUL		NULL
+energetic_cost	country	varchar(50)	NO			NULL
+energetic_cost	date	date	NO			NULL
+energetic_cost	company	varchar(50)	NO			NULL
+energetic_cost	contract_electrical	varchar(20)	NO			NULL
+energetic_cost	fee_type	varchar(20)	NO			NULL
+energetic_cost	fee_name	varchar(20)	NO			NULL
+energetic_cost	start_time	time	NO			NULL
+energetic_cost	end_time	time	NO			NULL
+energetic_cost	price_per_kWh	decimal(10,2)	NO			NULL
+energetic_cost	register_date	timestamp	NO		DEFAULT_GENERATED	CURRENT_TIMESTAMP
+energetic_cost	modified	date	NO			NULL
+energetic_cost	status	varchar(20)	NO			NULL
+gadgets	id	int	NO	PRI	auto_increment	NULL
+gadgets	user_id	int	NO	MUL		NULL
+gadgets	gadget_name	varchar(30)	NO			NULL
+gadgets	watts	int	NO			NULL
+gadgets	kWh	decimal(10,2)	YES			NULL
+gadgets	price_type	varchar(20)	YES			NULL
+gadgets	hours_usage	decimal(10,2)	NO			NULL
+gadgets	electrical_efficiency	varchar(5)	NO			NULL
+gadgets	gadget_type	varchar(20)	YES			NULL
+gadgets	house_location	varchar(20)	YES			NULL
+gadgets	status	varchar(20)	YES			AVAILABLE
+gadgets	removed_date	timestamp	YES			NULL
+gadgets	register_date	timestamp	NO		DEFAULT_GENERATED	CURRENT_TIMESTAMP
+gadgets	energetic_cost_id	int	NO			NULL
+gadgets	date	timestamp	NO			NULL
+history_consumption_bill	id	int	NO	PRI	auto_increment	NULL
+history_consumption_bill	user_id	int	NO	MUL		NULL
+history_consumption_bill	bill_date	date	NO			NULL
+history_consumption_bill	bill_number	int	NO			NULL
+history_consumption_bill	bill_month	varchar(50)	NO			NULL
+history_consumption_bill	kWh_consumption	int	NO			NULL
+history_consumption_bill	net_bill	decimal(10,2)	NO			NULL
+history_consumption_bill	kWh_price	decimal(10,2)	NO			NULL
+history_consumption_bill	register_date	timestamp	NO		DEFAULT_GENERATED	CURRENT_TIMESTAMP
+history_consumption_electric_meter	id	int	NO	PRI	auto_increment	NULL
+history_consumption_electric_meter	user_id	int	NO	MUL		NULL
+history_consumption_electric_meter	date_start	timestamp	NO			NULL
+history_consumption_electric_meter	date_end	timestamp	NO			NULL
+history_consumption_electric_meter	month	varchar(50)	NO			NULL
+history_consumption_electric_meter	em_start	int	NO			NULL
+history_consumption_electric_meter	em_end	int	NO			NULL
+history_consumption_electric_meter	kWh_consumption	int	NO			NULL
+history_consumption_electric_meter	register_date	timestamp	NO		DEFAULT_GENERATED	CURRENT_TIMESTAMP
+history_consumption_register	id	int	NO	PRI	auto_increment	NULL
+history_consumption_register	user_id	int	NO	MUL		NULL
+history_consumption_register	date	timestamp	NO			NULL
+history_consumption_register	gadget_id	int	NO	MUL		NULL
+history_consumption_register	watts_usage	decimal(10,2)	NO			NULL
+history_consumption_register	time_usage	decimal(10,2)	NO			NULL
+history_consumption_register	daily_kWh_usage	decimal(10,2)	NO			NULL
+history_consumption_register	energetic_cost_id	int	NO	MUL		NULL
+history_consumption_register	price_per_kWh	decimal(10,2)	NO			NULL
+history_consumption_register	net_daily_cost	decimal(10,2)	NO			NULL
+history_consumption_register	register_date	timestamp	NO		DEFAULT_GENERATED	CURRENT_TIMESTAMP
+users	id	int	NO	PRI	auto_increment	NULL
+users	first_name	varchar(100)	NO			NULL
+users	last_name	varchar(100)	NO			NULL
+users	user_name	varchar(20)	NO			NULL
+users	password	varchar(255)	NO			NULL
+users	email	varchar(100)	NO			NULL
+users	register_date	timestamp	NO		DEFAULT_GENERATED	CURRENT_TIMESTAMP
